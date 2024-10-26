@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -45,11 +45,10 @@
 
         input[type="text"],
         input[type="date"] {
-            width: 100%;
+            width: 97%;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-sizing: border-box;
         }
 
         button {
@@ -80,9 +79,35 @@
             transition: opacity 0.5s ease, top 0.5s ease;
             z-index: 1000;
         }
+
         .confirmation-message.show {
             opacity: 1;
             top: 50px;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 16px;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        select option {
+            background: white;
+            color: #333;
         }
     </style>
 </head>
@@ -106,6 +131,18 @@
         <div class="form-group">
             <label>Fecha de nacimiento:</label>
             <input type="date" id="nacimiento" name="nacimiento" required>
+        </div>
+        <div class="form-group">
+            <label for="actividad">ID actividad:</label>
+            <input type="text" id="actividad" name="actividad" required>
+        </div>
+        <div class="form-group">
+            <label for="alquila">Alquila equipamiento:</label>
+            <select id="alquila" name="alquila" required>
+                <option value="" disabled selected>Selecciona una opción:</option>
+                <option value="sí">Si</option>
+                <option value="no">No</option>
+            </select>
         </div>
         <button type="submit">Ingresar</button>
     </form>
