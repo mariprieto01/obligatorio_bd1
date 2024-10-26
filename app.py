@@ -23,5 +23,21 @@ def do_login():
 def tabs():
     return render_template('pestañas.html')
 
+@app.route('/alumno', methods=['GET', 'POST'])
+def nuevo_alumno():
+    return render_template('nuevoAlumno.html')
+
+@app.route('/instructor', methods=['GET', 'POST'])
+def nuevo_instructor():
+    return render_template('nuevoInstructor.html')
+
+@app.route('/clase', methods=['GET', 'POST'])
+def nueva_clase():
+    return render_template('nuevaClase.html')
+
+@app.route('/equipamiento', methods=['GET', 'POST'])
+def nuevo_equipamiento():
+    return render_template('nuevoEquipamiento.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
