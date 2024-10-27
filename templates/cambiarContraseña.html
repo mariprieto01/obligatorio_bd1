@@ -92,7 +92,7 @@
         <input type="password" id="confirmar-contrasena" name="confirmarContrasena" required>
 
         <button type="submit">Guardar nueva contraseña</button>
-        <button type="button" onclick="window.location.href = '/login';">Cancelar</button>
+        <button type="button" onclick="window.location.href='{{ url_for('login') }}'">Cancelar</button>
     </form>
 </div>
 </body>
