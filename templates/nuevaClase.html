@@ -38,7 +38,7 @@
 
         label {
             display: block;
-            font-weight: bold;
+            font-weight: normal;
             margin-bottom: 5px;
             color: #333;
         }
@@ -91,7 +91,7 @@
     <h2>Nueva clase</h2>
     <form id="claseForm" method="POST" action="/clase">
         <div class="form-group">
-            <label for="ci">ID:</label>
+            <label for="ci">ID clase:</label>
             <input type="text" id="id" name="id" required>
         </div>
         <div class="form-group">
@@ -105,10 +105,6 @@
         <div class="form-group">
             <label for="turno">ID turno:</label>
             <input type="text" id="turno" name="turno" required>
-        </div>
-        <div class="form-group">
-            <label for="dictada">Clase dictada:</label>
-            <input type="text" id="dictada" name="dictada" required>
         </div>
         <button type="submit">Ingresar</button>
     </form>
