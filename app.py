@@ -6,18 +6,22 @@ app = Flask(__name__)
 
 # Función para obtener la conexión a la base de datos
 def get_db_connection():
-    cnx = mysql.connector.connect(user='root', password='obligatorio', host='db', database='obligatorio')
+    cnx = mysql.connector.connect(user='root', password='obligatorio', host='127.0.0.1', database='obligatorio')
     return cnx
 
 # Ejemplo de uso: Realizar una consulta simple
-def ejemplo_consulta():
+@app.route('/ver_actividades')
+def ver_actividades():
     cnx = get_db_connection()
     cursor = cnx.cursor()
-    query = "SELECT * FROM usuario"
+    query = "SELECT * FROM actividades"
     cursor.execute(query)
-    for el in cursor:
-        print(el)
+    actividades = cursor.fetchall()  # Obtiene todos los resultados de la consulta
     cnx.close()
+
+    # Pasar los resultados a la plantilla para mostrarlos
+    return render_template('ver_actividades.html', actividades=actividades)
+
 
 
 @app.route('/')
@@ -74,4 +78,3 @@ def cambiar_contrasena():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    ejemplo_consulta()
