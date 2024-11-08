@@ -1,6 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for
+import mysql.connector
 
 app = Flask(__name__)
+
+
+# Función para obtener la conexión a la base de datos
+def get_db_connection():
+    cnx = mysql.connector.connect(user='root', password='obligatorio', host='db', database='obligatorio')
+    return cnx
+
+# Ejemplo de uso: Realizar una consulta simple
+def ejemplo_consulta():
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "SELECT * FROM usuario"
+    cursor.execute(query)
+    for el in cursor:
+        print(el)
+    cnx.close()
+
 
 @app.route('/')
 def login():
@@ -41,3 +59,4 @@ def nuevo_equipamiento():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    ejemplo_consulta()
