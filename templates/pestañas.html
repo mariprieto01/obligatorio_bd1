@@ -117,6 +117,8 @@
     <div class="tabs">
         <div class="tab active" onclick="showTab('alumnos')">Alumnos</div>
         <div class="tab" onclick="showTab('equipamiento')">Equipamiento</div>
+        <div class="tab" onclick="showTab('instructores')">Instructores</div>
+        <div class="tab" onclick="showTab('clases')">Clases</div>
     </div>
 
     <div id="alumnos" class="tab-content active">
@@ -168,6 +170,54 @@
             <div class="form-group">
                 <label for="costo">Costo:</label>
                 <input type="text" id="costo" placeholder="Costo del equipamiento">
+            </div>
+            <button class="search-button">Buscar</button>
+        </div>
+    </div>
+
+    <div id="instructores" class="tab-content">
+        <div class="container">
+            <div class="header">
+                <h1>Instructores</h1>
+                <button class="button" onclick="location.href='/instructor'">Nuevo Instructor</button>
+            </div>
+            <div class="form-group">
+                <label for="nombreInstructor">Nombre:</label>
+                <input type="text" id="nombreInstructor" placeholder="Nombre">
+            </div>
+            <div class="form-group">
+                <label for="apellidoInstructor">Apellido:</label>
+                <input type="text" id="apellidoInstructor" placeholder="Apellido">
+            </div>
+            <div class="form-group">
+                <label for="ci">CI:</label>
+                <input type="text" id="ci" placeholder="CI">
+            </div>
+            <button class="search-button">Buscar</button>
+        </div>
+    </div>
+
+    <div id="clases" class="tab-content">
+        <div class="container">
+            <div class="header">
+                <h1>Clases</h1>
+                <button class="button" onclick="location.href='/clase'">Nueva Clase</button>
+            </div>
+            <div class="form-group">
+                <label for="ciInstructor">Instructor:</label>
+                <input type="text" id="ciInstructor" placeholder="CI del instructor de la clase">
+            </div>
+            <div class="form-group">
+                <label for="actividad-clase">Actividad:</label>
+                <input type="text" id="actividad-clase" placeholder="Actividad">
+            </div>
+            <div class = "form-group">
+                <label for="turno">Turno:</label>
+                <input type="text" id="turno" placeholder="Turno">
+            </div>
+            <div class="form-group">
+                <label for="dictada">Dictada:</label>
+                <input type="text" id="dictada" placeholder="Dictada">
             </div>
             <button class="search-button">Buscar</button>
         </div>

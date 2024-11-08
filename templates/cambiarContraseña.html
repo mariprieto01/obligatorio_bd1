@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cambiar contraseña</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .container h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .container label {
+            margin-top: 10px;
+            display: block;
+            text-align: left;
+        }
+        .container input[type="text"],
+        .container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .container input[type="text"]:focus,
+        .container input[type="password"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .container button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .container button[type="submit"] {
+            background-color: #28a745;
+            color: white;
+        }
+        .container button[type="button"] {
+            background-color: #007bff;
+            color: white;
+        }
+        .container button:hover {
+            opacity: 0.9;
+        }
+        .mensaje {
+            margin: 10px 0;
+            color: red; /* Cambia el color según tu preferencia */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Cambiar contraseña</h1>
+
+    {% if mensaje %}
+    <div class="mensaje">{{ mensaje }}</div>
+    {% endif %}
+
+    <form action="/cambiar_contrasena" method="POST">
+        <label for="usuario">Usuario:</label>
+        <input type="text" id="usuario" name="usuario" required>
+
+        <label for="nueva-contrasena">Nueva contraseña:</label>
+        <input type="password" id="nueva-contrasena" name="nueva-contrasena" required>
+
+        <label for="confirmar-contrasena">Confirmar nueva contraseña:</label>
+        <input type="password" id="confirmar-contrasena" name="confirmarContrasena" required>
+
+        <button type="submit">Guardar nueva contraseña</button>
+        <button type="button" onclick="window.location.href='{{ url_for('login') }}'">Cancelar</button>
+    </form>
+</div>
+</body>
+</html>
