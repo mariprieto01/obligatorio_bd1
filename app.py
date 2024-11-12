@@ -31,15 +31,43 @@ def login():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        # Aquí puedes manejar la lógica para registrar al usuario
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        email = request.form['email']
+        password = request.form['password']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = """
+        INSERT INTO login (nombre, apellido, email, password)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (nombre, apellido, email, password))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
         return redirect(url_for('login'))
     return render_template('registro.html')
 
 @app.route('/login', methods=['GET','POST'])
 def do_login():
-    # Aquí puedes agregar la lógica para verificar el inicio de sesión
-    # Por ahora, solo redirigiremos a la página de pestañas
-    return redirect(url_for('tabs'))
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['´password']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = "SELECT * FROM login WHERE email = %s AND password = %s"
+        cursor.execute(query, (email, contraseña))
+        usuario = cursor.fetchone()
+        cursor.close()
+        cnx.close()
+
+        if usuario:
+            return redirect(url_for('tabs'))
+        else:
+            return render_template('login.html', error="Usuario o contraseña incorrectos.")
+    return render_template('login.html')
 
 @app.route('/pestañas')
 def tabs():
@@ -64,11 +92,18 @@ def nuevo_equipamiento():
 @app.route('/cambiar_contrasena', methods=['GET', 'POST'])
 def cambiar_contrasena():
     if request.method == 'POST':
-        usuario = request.form['usuario']
+        email = request.form['email']
         nueva_contrasena = request.form['nueva-contrasena']
         confirmar_contrasena = request.form['confirmarContrasena']
 
         if nueva_contrasena == confirmar_contrasena:
+            cnx = get_db_connection()
+            cursor = cnx.cursor()
+            query = "UPDATE login SET password = %s WHERE email = %s"
+            cursor.execute(query, (nueva_contrasena, email))
+            cnx.commit()
+            cursor.close()
+            cnx.close()
             return redirect(url_for('login', mensaje='Contraseña cambiada exitosamente'))
         else:
             return redirect(url_for('cambiar_contrasena', mensaje='Las contraseñas no coinciden'))
