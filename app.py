@@ -40,7 +40,7 @@ def registro():
         cursor = cnx.cursor()
         query = """
         INSERT INTO login (nombre, apellido, email, password)
-        VALUES (%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s)
         """
         cursor.execute(query, (nombre, apellido, email, password))
         cnx.commit()
@@ -53,17 +53,17 @@ def registro():
 def do_login():
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['´password']
+        password = request.form['password']
 
         cnx = get_db_connection()
         cursor = cnx.cursor()
         query = "SELECT * FROM login WHERE email = %s AND password = %s"
-        cursor.execute(query, (email, contraseña))
-        usuario = cursor.fetchone()
+        cursor.execute(query, (email, password))
+        email = cursor.fetchone()
         cursor.close()
         cnx.close()
 
-        if usuario:
+        if email:
             return redirect(url_for('tabs'))
         else:
             return render_template('login.html', error="Usuario o contraseña incorrectos.")
