@@ -3,26 +3,10 @@ import mysql.connector
 
 app = Flask(__name__)
 
-
 # Función para obtener la conexión a la base de datos
 def get_db_connection():
     cnx = mysql.connector.connect(user='root', password='obligatorio', host='127.0.0.1', database='obligatorio')
     return cnx
-
-# Ejemplo de uso: Realizar una consulta simple
-@app.route('/ver_actividades')
-def ver_actividades():
-    cnx = get_db_connection()
-    cursor = cnx.cursor()
-    query = "SELECT * FROM actividades"
-    cursor.execute(query)
-    actividades = cursor.fetchall()  # Obtiene todos los resultados de la consulta
-    cnx.close()
-
-    # Pasar los resultados a la plantilla para mostrarlos
-    return render_template('ver_actividades.html', actividades=actividades)
-
-
 
 @app.route('/')
 def login():
@@ -31,50 +15,76 @@ def login():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        # Aquí puedes manejar la lógica para registrar al usuario
         return redirect(url_for('login'))
     return render_template('registro.html')
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def do_login():
-    # Aquí puedes agregar la lógica para verificar el inicio de sesión
-    # Por ahora, solo redirigiremos a la página de pestañas
     return redirect(url_for('tabs'))
 
-@app.route('/pestañas')
+@app.route('/pestañas', methods=['GET', 'POST'])
 def tabs():
-    return render_template('pestañas.html')
+    resultados = []
+    equipamiento_resultados = []
 
-@app.route('/alumno', methods=['GET', 'POST'])
-def nuevo_alumno():
-    return render_template('nuevoAlumno.html')
+    # Conexión a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
 
-@app.route('/instructor', methods=['GET', 'POST'])
-def nuevo_instructor():
-    return render_template('nuevoInstructor.html')
-
-@app.route('/clase', methods=['GET', 'POST'])
-def nueva_clase():
-    return render_template('nuevaClase.html')
-
-@app.route('/equipamiento', methods=['GET', 'POST'])
-def nuevo_equipamiento():
-    return render_template('nuevoEquipamiento.html')
-
-@app.route('/cambiar_contrasena', methods=['GET', 'POST'])
-def cambiar_contrasena():
     if request.method == 'POST':
-        usuario = request.form['usuario']
-        nueva_contrasena = request.form['nueva-contrasena']
-        confirmar_contrasena = request.form['confirmarContrasena']
+        # Si se hace búsqueda en la sección de Alumnos
+        if 'nombre' in request.form or 'apellido' in request.form or 'actividad' in request.form or 'alquila' in request.form:
+            nombre = request.form.get('nombre', '')
+            apellido = request.form.get('apellido', '')
+            actividad = request.form.get('actividad', '')
+            alquila = request.form.get('alquila', '')
 
-        if nueva_contrasena == confirmar_contrasena:
-            return redirect(url_for('login', mensaje='Contraseña cambiada exitosamente'))
-        else:
-            return redirect(url_for('cambiar_contrasena', mensaje='Las contraseñas no coinciden'))
+            query = "SELECT * FROM alumnos WHERE 1=1"
+            params = []
+            if nombre:
+                query += " AND nombre LIKE %s"
+                params.append(f"%{nombre}%")
+            if apellido:
+                query += " AND apellido LIKE %s"
+                params.append(f"%{apellido}%")
+            if actividad:
+                query += " AND actividad LIKE %s"
+                params.append(f"%{actividad}%")
+            if alquila:
+                query += " AND alquila LIKE %s"
+                params.append(f"%{alquila}%")
 
-    mensaje = request.args.get('mensaje')
-    return render_template('cambiarContraseña.html', mensaje=mensaje)
+            cursor.execute(query, params)
+            resultados = cursor.fetchall()
+
+        # Si se hace búsqueda en la sección de Equipamiento
+        elif 'tipo' in request.form or 'estado' in request.form or 'talle' in request.form:
+            tipo = request.form.get('tipo', '')
+            estado = request.form.get('estado', '')
+            talle = request.form.get('talle', '')
+
+            query = "SELECT * FROM equipamiento WHERE 1=1"
+            params = []
+            if tipo:
+                query += " AND tipo LIKE %s"
+                params.append(f"%{tipo}%")
+            if estado:
+                query += " AND estado LIKE %s"
+                params.append(f"%{estado}%")
+            if talle:
+                query += " AND talle LIKE %s"
+                params.append(f"%{talle}%")
+
+            cursor.execute(query, params)
+            equipamiento_resultados = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('pestañas.html',
+                           resultados=resultados,
+                           equipamiento_resultados=equipamiento_resultados,
+                           request=request)
 
 if __name__ == '__main__':
     app.run(debug=True)

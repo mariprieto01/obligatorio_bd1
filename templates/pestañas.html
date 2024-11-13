@@ -122,58 +122,115 @@
     </div>
 
     <div id="alumnos" class="tab-content active">
-        <!-- Contenido de la pestaña Alumnos -->
         <div class="container">
             <div class="header">
                 <h1>Alumnos</h1>
                 <button class="button" onclick="location.href='/alumno'">Nuevo Alumno</button>
             </div>
-            <div class="form-group">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" placeholder="Nombre">
-            </div>
-            <div class="form-group">
-                <label for="apellido">Apellido:</label>
-                <input type="text" id="apellido" placeholder="Apellido">
-            </div>
-            <div class="form-group">
-                <label for="actividad">Actividad:</label>
-                <input type="text" id="actividad" placeholder="Actividad">
-            </div>
-            <div class="form-group">
-                <label for="alquila">Alquila:</label>
-                <input type="text" id="alquila" placeholder="Alquila">
-            </div>
-            <button class="search-button">Buscar</button>
+
+            <!-- Formulario de búsqueda -->
+            <form method="post" action="/pestañas">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Nombre">
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido:</label>
+                    <input type="text" id="apellido" name="apellido" placeholder="Apellido">
+                </div>
+                <div class="form-group">
+                    <label for="actividad">Actividad:</label>
+                    <input type="text" id="actividad" name="actividad" placeholder="Actividad">
+                </div>
+                <div class="form-group">
+                    <label for="alquila">Alquila:</label>
+                    <input type="text" id="alquila" name="alquila" placeholder="Alquila">
+                </div>
+                <button class="search-button" type="submit">Buscar</button>
+            </form>
+
+            <!-- Tabla de resultados -->
+            {% if resultados %}
+                <table border="1" style="width: 100%; margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Actividad</th>
+                        <th>Alquila</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for alumno in resultados %}
+                        <tr>
+                            <td>{{ alumno.nombre }}</td>
+                            <td>{{ alumno.apellido }}</td>
+                            <td>{{ alumno.actividad }}</td>
+                            <td>{{ alumno.alquila }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="margin-top: 20px;">No se encontraron resultados.</p>
+            {% endif %}
         </div>
     </div>
 
-    <div id="equipamiento" class="tab-content">
-        <!-- Contenido de la pestaña Equipamiento -->
+    <div id="equipamiento" class="tab-content {% if request.form.get('tipo') %}active{% endif %}">
         <div class="container">
             <div class="header">
                 <h1>Equipamiento</h1>
                 <button class="button" onclick="location.href='/equipamiento'">Nuevo Equipamiento</button>
             </div>
-            <div class="form-group">
-                <label for="titulo">Equipamiento:</label>
-                <input type="text" id="titulo" placeholder="Nombre del equipamiento">
-            </div>
-            <div class="form-group">
-                <label for="descripcion">Descripción:</label>
-                <input type="text" id="descripcion" placeholder="Descripción del equipamiento">
-            </div>
-            <div class="form-group">
-                <label for="actividad-eq">Actividad:</label>
-                <input type="text" id="actividad-eq" placeholder="Actividad relacionada">
-            </div>
-            <div class="form-group">
-                <label for="costo">Costo:</label>
-                <input type="text" id="costo" placeholder="Costo del equipamiento">
-            </div>
-            <button class="search-button">Buscar</button>
+
+            <!-- Formulario de búsqueda de equipamiento -->
+            <form method="post" action="/pestañas">
+                <div class="form-group">
+                    <label for="tipo">Tipo:</label>
+                    <input type="text" id="tipo" name="tipo" placeholder="Tipo de equipamiento" value="{{ request.form.get('tipo', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <input type="text" id="estado" name="estado" placeholder="Estado del equipamiento" value="{{ request.form.get('estado', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="talle">Talle:</label>
+                    <input type="text" id="talle" name="talle" placeholder="Talle del equipamiento" value="{{ request.form.get('talle', '') }}">
+                </div>
+                <input type="hidden" name="tab" value="equipamiento">
+                <button class="search-button" type="submit">Buscar</button>
+            </form>
+
+            <!-- Tabla de resultados de equipamiento -->
+            {% if equipamiento_resultados %}
+                <table border="1" style="width: 100%; margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Talle</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for equipo in equipamiento_resultados %}
+                        <tr>
+                            <td>{{ equipo.tipo }}</td>
+                            <td>{{ equipo.estado }}</td>
+                            <td>{{ equipo.talle }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% elif request.form.get('tipo') is not none %}
+                <p style="margin-top: 20px;">No se encontraron resultados.</p>
+            {% endif %}
         </div>
     </div>
+
+
+
+
 
     <div id="instructores" class="tab-content">
         <div class="container">
@@ -181,19 +238,47 @@
                 <h1>Instructores</h1>
                 <button class="button" onclick="location.href='/instructor'">Nuevo Instructor</button>
             </div>
-            <div class="form-group">
-                <label for="nombreInstructor">Nombre:</label>
-                <input type="text" id="nombreInstructor" placeholder="Nombre">
-            </div>
-            <div class="form-group">
-                <label for="apellidoInstructor">Apellido:</label>
-                <input type="text" id="apellidoInstructor" placeholder="Apellido">
-            </div>
-            <div class="form-group">
-                <label for="ci">CI:</label>
-                <input type="text" id="ci" placeholder="CI">
-            </div>
-            <button class="search-button">Buscar</button>
+
+            <!-- Formulario de búsqueda -->
+            <form method="post" action="/pestañas">
+                <div class="form-group">
+                    <label for="nombreInstructor">Nombre:</label>
+                    <input type="text" id="nombreInstructor" name="nombreInstructor" placeholder="Nombre">
+                </div>
+                <div class="form-group">
+                    <label for="apellidoInstructor">Apellido:</label>
+                    <input type="text" id="apellidoInstructor" name="apellidoInstructor" placeholder="Apellido">
+                </div>
+                <div class="form-group">
+                    <label for="ci">CI:</label>
+                    <input type="text" id="ci" name="ci" placeholder="CI">
+                </div>
+                <button class="search-button" type="submit">Buscar</button>
+            </form>
+
+            <!-- Tabla de resultados -->
+            {% if instructores_resultados %}
+                <table border="1" style="width: 100%; margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>CI</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for instructor in instructores_resultados %}
+                        <tr>
+                            <td>{{ instructor.nombre }}</td>
+                            <td>{{ instructor.apellido }}</td>
+                            <td>{{ instructor.ci }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% elif 'nombreInstructor' in request.form %}
+                <p style="margin-top: 20px;">No se encontraron resultados.</p>
+            {% endif %}
         </div>
     </div>
 
