@@ -15,12 +15,43 @@ def login():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        email = request.form['email']
+        password = request.form['password']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = """
+        INSERT INTO login (nombre, apellido, email, password)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (nombre, apellido, email, password))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
         return redirect(url_for('login'))
     return render_template('registro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def do_login():
-    return redirect(url_for('tabs'))
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = "SELECT * FROM login WHERE correo = %s AND password = %s"
+        cursor.execute(query, (email, password))
+        email = cursor.fetchone()
+        cursor.close()
+        cnx.close()
+
+        if email:
+            return redirect(url_for('tabs'))
+        else:
+            return render_template('login.html', error="email o contraseña incorrectos.")
+    return render_template('login.html')
 
 @app.route('/pestañas', methods=['GET', 'POST'])
 def tabs():
@@ -32,7 +63,7 @@ def tabs():
     cursor = cnx.cursor(dictionary=True)
 
     if request.method == 'POST':
-        # Si se hace búsqueda en la sección de Alumnos
+        # Procesar búsqueda en la sección de Alumnos
         if 'nombre' in request.form or 'apellido' in request.form or 'actividad' in request.form or 'alquila' in request.form:
             nombre = request.form.get('nombre', '')
             apellido = request.form.get('apellido', '')
@@ -57,7 +88,7 @@ def tabs():
             cursor.execute(query, params)
             resultados = cursor.fetchall()
 
-        # Si se hace búsqueda en la sección de Equipamiento
+        # Procesar búsqueda en la sección de Equipamiento
         elif 'tipo' in request.form or 'estado' in request.form or 'talle' in request.form:
             tipo = request.form.get('tipo', '')
             estado = request.form.get('estado', '')
