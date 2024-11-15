@@ -3,26 +3,10 @@ import mysql.connector
 
 app = Flask(__name__)
 
-
 # Función para obtener la conexión a la base de datos
 def get_db_connection():
     cnx = mysql.connector.connect(user='root', password='obligatorio', host='127.0.0.1', database='obligatorio')
     return cnx
-
-# Ejemplo de uso: Realizar una consulta simple
-@app.route('/ver_actividades')
-def ver_actividades():
-    cnx = get_db_connection()
-    cursor = cnx.cursor()
-    query = "SELECT * FROM actividades"
-    cursor.execute(query)
-    actividades = cursor.fetchall()  # Obtiene todos los resultados de la consulta
-    cnx.close()
-
-    # Pasar los resultados a la plantilla para mostrarlos
-    return render_template('ver_actividades.html', actividades=actividades)
-
-
 
 @app.route('/')
 def login():
@@ -49,7 +33,7 @@ def registro():
         return redirect(url_for('login'))
     return render_template('registro.html')
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def do_login():
     if request.method == 'POST':
         email = request.form['email']
@@ -64,52 +48,58 @@ def do_login():
         cnx.close()
 
         if email:
-            return redirect(url_for('tabs'))
+            return redirect(url_for('alumnos'))
         else:
-            return render_template('login.html', error="Usuario o contraseña incorrectos.")
+            return render_template('login.html', error="email o contraseña incorrectos.")
     return render_template('login.html')
 
-@app.route('/pestañas')
-def tabs():
+@app.route('/alumnos', methods=['GET', 'POST'])
+def alumnos():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '')  # Si no existe 'nombre', asignar un valor vacío
+        apellido = request.form.get('apellido', '')  # Lo mismo para 'apellido'
+        actividad = request.form.get('actividad', '')  # Y para 'actividad'
+        alquila = request.form.get('alquila', '')  # Y para 'alquila'
+
+        # Conectar a la base de datos y hacer la consulta
+        cnx = get_db_connection()
+        cursor = cnx.cursor(dictionary=True)  # Usar dictionary=True para que el resultado sea más fácil de manejar
+
+        # Construcción de la consulta base
+        query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila FROM alumnos WHERE 1=1"
+
+        # Lista para los parámetros de la consulta
+        params = []
+
+        # Agregar condiciones dinámicas si los campos no están vacíos
+        if nombre:
+            query += " AND nombre LIKE %s"
+            params.append('%' + nombre + '%')
+
+        if apellido:
+            query += " AND apellido LIKE %s"
+            params.append('%' + apellido + '%')
+
+        if actividad:
+            query += " AND id_actividad LIKE %s"
+            params.append('%' + actividad + '%')
+
+        if alquila:
+            query += " AND alquila LIKE %s"
+            params.append('%' + alquila + '%')
+
+        # Ejecutar la consulta con los parámetros
+        cursor.execute(query, params)
+        alumnos_result = cursor.fetchall()  # Obtener todos los resultados
+        cursor.close()
+        cnx.close()
+
+        return render_template('pestañas.html', alumnos=alumnos_result)
     return render_template('pestañas.html')
 
-@app.route('/alumno', methods=['GET', 'POST'])
-def nuevo_alumno():
-    return render_template('nuevoAlumno.html')
 
-@app.route('/instructor', methods=['GET', 'POST'])
-def nuevo_instructor():
-    return render_template('nuevoInstructor.html')
 
-@app.route('/clase', methods=['GET', 'POST'])
-def nueva_clase():
-    return render_template('nuevaClase.html')
 
-@app.route('/equipamiento', methods=['GET', 'POST'])
-def nuevo_equipamiento():
-    return render_template('nuevoEquipamiento.html')
-
-@app.route('/cambiar_contrasena', methods=['GET', 'POST'])
-def cambiar_contrasena():
-    if request.method == 'POST':
-        email = request.form['email']
-        nueva_contrasena = request.form['nueva-contrasena']
-        confirmar_contrasena = request.form['confirmarContrasena']
-
-        if nueva_contrasena == confirmar_contrasena:
-            cnx = get_db_connection()
-            cursor = cnx.cursor()
-            query = "UPDATE login SET password = %s WHERE email = %s"
-            cursor.execute(query, (nueva_contrasena, email))
-            cnx.commit()
-            cursor.close()
-            cnx.close()
-            return redirect(url_for('login', mensaje='Contraseña cambiada exitosamente'))
-        else:
-            return redirect(url_for('cambiar_contrasena', mensaje='Las contraseñas no coinciden'))
-
-    mensaje = request.args.get('mensaje')
-    return render_template('cambiarContraseña.html', mensaje=mensaje)
 
 if __name__ == '__main__':
     app.run(debug=True)
