@@ -97,6 +97,53 @@ def alumnos():
         return render_template('pestañas.html', alumnos=alumnos_result)
     return render_template('pestañas.html')
 
+@app.route('/equipamiento', methods=['GET', 'POST'])
+def equipamiento():
+    if request.method == 'POST':
+        # Obtener los valores del formulario
+        id = request.form.get('id', '').strip()
+        actividad = request.form.get('actividad', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+        costo = request.form.get('costo', '').strip()
+
+        # Conectar a la base de datos
+        cnx = get_db_connection()
+        cursor = cnx.cursor(dictionary=True)
+
+        # Consulta base
+        query = "SELECT idEquipamiento, idActividad, descripcion, costo FROM equipamiento WHERE 1=1"
+
+        # Lista para los parámetros de la consulta
+        params = []
+
+        # Agregar condiciones dinámicas si los campos no están vacíos
+        if id:
+            query += " AND idEquipamiento LIKE %s"
+            params.append('%' + id + '%')
+
+        if actividad:
+            query += " AND idActividad LIKE %s"
+            params.append('%' + actividad + '%')
+
+        if descripcion:
+            query += " AND descripcion LIKE %s"
+            params.append('%' + descripcion + '%')
+
+        if costo:
+            query += " AND costo LIKE %s"
+            params.append('%' + costo + '%')
+
+        # Ejecutar la consulta con los parámetros
+        cursor.execute(query, params)
+        equipamiento_result = cursor.fetchall()  # Obtener todos los resultados
+        cursor.close()
+        cnx.close()
+
+        # Pasar los resultados a la plantilla
+        return render_template('pestañas.html', equipamientos=equipamiento_result)
+
+    # Si la solicitud es GET, simplemente renderizamos la página vacía
+    return render_template('pestañas.html')
 
 
 
