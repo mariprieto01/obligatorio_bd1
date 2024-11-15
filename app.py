@@ -97,9 +97,91 @@ def alumnos():
         return render_template('pestañas.html', alumnos=alumnos_result)
     return render_template('pestañas.html')
 
+    @app.route('/instructor', methods=['GET', 'POST'])
+    def instructor():
+        if request.method == 'POST':
+            ci_instructor = request.form.get('ci', '').strip()
+            nombre = request.form.get('nombre', '').strip()
+            apellido = request.form.get('apellido', '').strip()
 
+            cnx = get_db_connection()
+            cursor = cnx.cursor(dictionary=True)
 
+            query = """
+                SELECT ciInstructor, nombre, apellido
+                FROM instructores
+                WHERE 1=1
+            """
+            params = []
 
+            if ci_instructor:
+                query += " AND ciInstructor LIKE %s"
+                params.append('%' + ci_instructor + '%')
+
+            if nombre:
+                query += " AND nombre LIKE %s"
+                params.append('%' + nombre + '%')
+
+            if apellido:
+                query += " AND apellido LIKE %s"
+                params.append('%' + apellido + '%')
+
+            cursor.execute(query, params)
+            instructores_result = cursor.fetchall()
+            cursor.close()
+            cnx.close()
+
+            return render_template('instructor.html', instructores=instructores_result)
+
+        return render_template('instructor.html')
+
+    @app.route('/clase', methods=['GET', 'POST'])
+    def clase():
+        if request.method == 'POST':
+            id_clase = request.form.get('id', '').strip()
+            ci_instructor = request.form.get('instructor', '').strip()
+            id_actividad = request.form.get('actividad', '').strip()
+            id_turno = request.form.get('turno', '').strip()
+            dictada = request.form.get('dictada', '').strip()
+
+            cnx = get_db_connection()
+            cursor = cnx.cursor(dictionary=True)
+
+            query = """
+                SELECT idClase, ciInstructor, idActividad, idTurno, dictada
+                FROM clase
+                WHERE 1=1
+            """
+            params = []
+
+            if id_clase:
+                query += " AND idClase = %s"
+                params.append(id_clase)
+
+            if ci_instructor:
+                query += " AND ciInstructor = %s"
+                params.append(ci_instructor)
+
+            if id_actividad:
+                query += " AND idActividad = %s"
+                params.append(id_actividad)
+
+            if id_turno:
+                query += " AND idTurno = %s"
+                params.append(id_turno)
+
+            if dictada:
+                query += " AND dictada = %s"
+                params.append(dictada)
+
+            cursor.execute(query, params)
+            clases_result = cursor.fetchall()
+            cursor.close()
+            cnx.close()
+
+            return render_template('clase.html', clases=clases_result)
+
+        return render_template('clase.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

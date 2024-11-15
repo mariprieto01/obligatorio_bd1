@@ -235,59 +235,49 @@
         </div>
     </div>
 
-
-
-
-
-    <div id="instructores" class="tab-content">
-        <div class="container">
-            <div class="header">
-                <h1>Instructores</h1>
-                <button class="button" onclick="location.href='/instructor'">Nuevo Instructor</button>
+    <div class="form-container">
+        <h2>Buscar Instructores</h2>
+        <form id="instructorForm" method="POST" action="/instructor">
+            <div class="form-group">
+                <label for="ci">Cédula:</label>
+                <input type="text" id="ci" name="ci">
             </div>
+            <div class="form-group">
+                <label for="nombreInstructor">Nombre:</label>
+                <input type="text" id="nombreInstructor" name="nombre">
+            </div>
+            <div class="form-group">
+                <label for="apellidoInstructor">Apellido:</label>
+                <input type="text" id="apellidoInstructor" name="apellido">
+            </div>
+            <button type="submit">Buscar</button>
+        </form>
 
-            <!-- Formulario de búsqueda -->
-            <form method="post" action="/pestañas">
-                <div class="form-group">
-                    <label for="nombreInstructor">Nombre:</label>
-                    <input type="text" id="nombreInstructor" name="nombreInstructor" placeholder="Nombre">
-                </div>
-                <div class="form-group">
-                    <label for="apellidoInstructor">Apellido:</label>
-                    <input type="text" id="apellidoInstructor" name="apellidoInstructor" placeholder="Apellido">
-                </div>
-                <div class="form-group">
-                    <label for="ci">CI:</label>
-                    <input type="text" id="ci" name="ci" placeholder="CI">
-                </div>
-                <button class="search-button" type="submit">Buscar</button>
-            </form>
-
-            <!-- Tabla de resultados -->
-            {% if instructores_resultados %}
-                <table border="1" style="width: 100%; margin-top: 20px;">
-                    <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>CI</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for instructor in instructores_resultados %}
-                        <tr>
-                            <td>{{ instructor.nombre }}</td>
-                            <td>{{ instructor.apellido }}</td>
-                            <td>{{ instructor.ci }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% elif 'nombreInstructor' in request.form %}
-                <p style="margin-top: 20px;">No se encontraron resultados.</p>
-            {% endif %}
-        </div>
+        {% if instructores %}
+        <h2>Resultados de la Búsqueda</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for instructor in instructores %}
+            <tr>
+                <td>{{ instructor.ciInstructor }}</td>
+                <td>{{ instructor.nombre }}</td>
+                <td>{{ instructor.apellido }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
+
+
+
 
     <div id="clases" class="tab-content">
         <div class="container">
@@ -308,12 +298,39 @@
                 <input type="text" id="turno" placeholder="Turno">
             </div>
             <div class="form-group">
-                <label for="dictada">Dictada:</label>
-                <input type="text" id="dictada" placeholder="Dictada">
+                <label for="dictada">¿Dictada? (0 = No, 1 = Sí):</label>
+                <input type="text" id="dictada" name="dictada">
             </div>
             <button class="search-button">Buscar</button>
         </div>
+
+        {% if clases %}
+        <h2>Resultados</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID Clase</th>
+                <th>Cédula Instructor</th>
+                <th>ID Actividad</th>
+                <th>ID Turno</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for clase in clases %}
+            <tr>
+                <td>{{ clase.idClase }}</td>
+                <td>{{ clase.idInstructor }}</td>
+                <td>{{ clase.idActividad }}</td>
+                <td>{{ clase.idTurno }}</td>
+                <td>{{ "Sí" if clase.dictada == b'1' else "No" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
+
+
 </div>
 
 
