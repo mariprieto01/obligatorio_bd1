@@ -126,7 +126,7 @@
         <div class="container">
             <div class="header">
                 <h1>Alumnos</h1>
-                <button class="button">Nuevo Alumno</button>
+                <button class="button" onclick="window.location.href='{{ url_for('nuevo_alumno') }}'">Nuevo Alumno</button>
             </div>
 
             <!-- Formulario de búsqueda -->
@@ -188,7 +188,7 @@
         <div class="container">
             <div class="header">
                 <h1>Equipamiento</h1>
-                <button class="button" onclick="location.href='/equipamiento'">Nuevo Equipamiento</button>
+                <button class="button" onclick="window.location.href='{{ url_for('nuevo_equipamiento') }}'">Nuevo Equipamiento</button>
             </div>
 
             <!-- Formulario de búsqueda de equipamiento -->
@@ -243,7 +243,7 @@
         <div class="container">
             <div class="header">
                 <h1>Instructores</h1>
-                <button class="button" onclick="location.href='/instructor'">Nuevo Instructor</button>
+                <button class="button" onclick="window.location.href='{{ url_for('nuevo_instructor') }}'">Nuevo Instructor</button>
             </div>
 
             <!-- Formulario de búsqueda -->
@@ -293,7 +293,7 @@
         <div class="container">
             <div class="header">
                 <h1>Clases</h1>
-                <button class="button" onclick="location.href='/clase'">Nueva Clase</button>
+                <button class="button" onclick="window.location.href='{{ url_for('nueva_clase') }}'">Nueva Clase</button>
             </div>
             <div class="form-group">
                 <label for="ciInstructor">Instructor:</label>
@@ -316,7 +316,17 @@
     </div>
 </div>
 
+<script>
+    function showTab(tabId) {
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => tab.classList.remove('active'));
 
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
 
 </body>
 </html>
