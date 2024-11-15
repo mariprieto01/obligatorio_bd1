@@ -41,81 +41,65 @@ def do_login():
 
         cnx = get_db_connection()
         cursor = cnx.cursor()
-        query = "SELECT * FROM login WHERE correo = %s AND password = %s"
+        query = "SELECT * FROM login WHERE email = %s AND password = %s"
         cursor.execute(query, (email, password))
         email = cursor.fetchone()
         cursor.close()
         cnx.close()
 
         if email:
-            return redirect(url_for('tabs'))
+            return redirect(url_for('alumnos'))
         else:
             return render_template('login.html', error="email o contraseña incorrectos.")
     return render_template('login.html')
 
-@app.route('/pestañas', methods=['GET', 'POST'])
-def tabs():
-    resultados = []
-    equipamiento_resultados = []
-
-    # Conexión a la base de datos
-    cnx = get_db_connection()
-    cursor = cnx.cursor(dictionary=True)
-
+@app.route('/alumnos', methods=['GET', 'POST'])
+def alumnos():
     if request.method == 'POST':
-        # Procesar búsqueda en la sección de Alumnos
-        if 'nombre' in request.form or 'apellido' in request.form or 'actividad' in request.form or 'alquila' in request.form:
-            nombre = request.form.get('nombre', '')
-            apellido = request.form.get('apellido', '')
-            actividad = request.form.get('actividad', '')
-            alquila = request.form.get('alquila', '')
+        nombre = request.form.get('nombre', '')  # Si no existe 'nombre', asignar un valor vacío
+        apellido = request.form.get('apellido', '')  # Lo mismo para 'apellido'
+        actividad = request.form.get('actividad', '')  # Y para 'actividad'
+        alquila = request.form.get('alquila', '')  # Y para 'alquila'
 
-            query = "SELECT * FROM alumnos WHERE 1=1"
-            params = []
-            if nombre:
-                query += " AND nombre LIKE %s"
-                params.append(f"%{nombre}%")
-            if apellido:
-                query += " AND apellido LIKE %s"
-                params.append(f"%{apellido}%")
-            if actividad:
-                query += " AND actividad LIKE %s"
-                params.append(f"%{actividad}%")
-            if alquila:
-                query += " AND alquila LIKE %s"
-                params.append(f"%{alquila}%")
+        # Conectar a la base de datos y hacer la consulta
+        cnx = get_db_connection()
+        cursor = cnx.cursor(dictionary=True)  # Usar dictionary=True para que el resultado sea más fácil de manejar
 
-            cursor.execute(query, params)
-            resultados = cursor.fetchall()
+        # Construcción de la consulta base
+        query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila FROM alumnos WHERE 1=1"
 
-        # Procesar búsqueda en la sección de Equipamiento
-        elif 'tipo' in request.form or 'estado' in request.form or 'talle' in request.form:
-            tipo = request.form.get('tipo', '')
-            estado = request.form.get('estado', '')
-            talle = request.form.get('talle', '')
+        # Lista para los parámetros de la consulta
+        params = []
 
-            query = "SELECT * FROM equipamiento WHERE 1=1"
-            params = []
-            if tipo:
-                query += " AND tipo LIKE %s"
-                params.append(f"%{tipo}%")
-            if estado:
-                query += " AND estado LIKE %s"
-                params.append(f"%{estado}%")
-            if talle:
-                query += " AND talle LIKE %s"
-                params.append(f"%{talle}%")
+        # Agregar condiciones dinámicas si los campos no están vacíos
+        if nombre:
+            query += " AND nombre LIKE %s"
+            params.append('%' + nombre + '%')
 
-            cursor.execute(query, params)
-            equipamiento_resultados = cursor.fetchall()
+        if apellido:
+            query += " AND apellido LIKE %s"
+            params.append('%' + apellido + '%')
 
-    cursor.close()
-    cnx.close()
+        if actividad:
+            query += " AND id_actividad LIKE %s"
+            params.append('%' + actividad + '%')
 
-    return render_template('pestañas.html',
-                           resultados=resultados,
-                           equipamiento_resultados=equipamiento_resultados,
-                           request=request)
+        if alquila:
+            query += " AND alquila LIKE %s"
+            params.append('%' + alquila + '%')
+
+        # Ejecutar la consulta con los parámetros
+        cursor.execute(query, params)
+        alumnos_result = cursor.fetchall()  # Obtener todos los resultados
+        cursor.close()
+        cnx.close()
+
+        return render_template('pestañas.html', alumnos=alumnos_result)
+    return render_template('pestañas.html')
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
