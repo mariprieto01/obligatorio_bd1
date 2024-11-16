@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-button {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .search-button:hover {
+            background-color: #007bb5;
+        }
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .tabla thead tr {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .tabla th, .tabla td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+        .tabla tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .tabla tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+<div id="instructores" class="tab-content">
+    <div class="container">
+        <div class="header">
+            <h1>Instructores</h1>
+            <button class="button" onclick="location.href='/instructor'">Nuevo Instructor</button>
+        </div>
+        <form action="/buscar_instructores" method="POST">
+            <div class="form-group">
+                <label for="nombreInstructor">Nombre:</label>
+                <input type="text" id="nombreInstructor" name="nombreInstructor" placeholder="Nombre">
+            </div>
+            <div class="form-group">
+                <label for="apellidoInstructor">Apellido:</label>
+                <input type="text" id="apellidoInstructor" name="apellidoInstructor" placeholder="Apellido">
+            </div>
+            <div class="form-group">
+                <label for="ci">CI:</label>
+                <input type="text" id="ci" name="ci" placeholder="CI">
+            </div>
+            <button class="search-button" type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <!-- Tabla dinámica para mostrar los resultados -->
+    {% if instructores %}
+        <div class="table-container">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>CI</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for instructor in instructores %}
+                    <tr>
+                        <td>{{ instructor.nombre }}</td>
+                        <td>{{ instructor.apellido }}</td>
+                        <td>{{ instructor.ciInstructor }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

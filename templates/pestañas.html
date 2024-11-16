@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página con Pestañas</title>
     <style>
+        /* Estilo general */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -14,12 +15,14 @@
             align-items: center;
         }
 
+        /* Estilo del contenedor de pestañas */
         .tab-container {
             width: 100%;
             max-width: 800px;
             margin: 20px;
         }
 
+        /* Estilo de las pestañas */
         .tabs {
             display: flex;
             justify-content: space-around;
@@ -42,6 +45,7 @@
             background-color: #007bff;
         }
 
+        /* Estilo del contenido */
         .tab-content {
             display: none;
             padding: 20px;
@@ -54,9 +58,11 @@
             display: block;
         }
 
+        /* Estilo para el contenido de la pestaña Alumnos */
         .container {
             width: 80%;
             margin: 20px auto;
+            font-family: Arial, sans-serif;
         }
 
         .header {
@@ -145,38 +151,38 @@
             </form>
 
             {% if alumnos %}
-            <table>
-                <thead>
-                <tr>
-                    <th>CI Alumno</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Fecha de Nacimiento</th>
-                    <th>Actividad</th>
-                    <th>Alquila</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for alumno in alumnos %}
-                <tr>
-                    <td>{{ alumno.ciAlumno }}</td>
-                    <td>{{ alumno.nombre }}</td>
-                    <td>{{ alumno.apellido }}</td>
-                    <td>{{ alumno.fecha_nacimiento }}</td>
-                    <td>{{ alumno.idActividad }}</td>
-                    <td>{{ alumno.alquila }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>CI Alumno</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Fecha de Nacimiento</th>
+                        <th>Actividad</th>
+                        <th>Alquila</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for alumno in alumnos %}
+                        <tr>
+                            <td>{{ alumno.ciAlumno }}</td>
+                            <td>{{ alumno.nombre }}</td>
+                            <td>{{ alumno.apellido }}</td>
+                            <td>{{ alumno.fecha_nacimiento }}</td>
+                            <td>{{ alumno.idActividad }}</td>
+                            <td>{{ alumno.alquila }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
-            <p>No se encontraron alumnos.</p>
+                <p>No se encontraron alumnos.</p>
             {% endif %}
         </div>
     </div>
 
-    <div id="equipamiento" class="tab-content {% if request.form.get('id') %}active{% endif %}">
-    <div class="container">
+    <div id="equipamiento" class="tab-content {% if request.form.get('tipo') %}active{% endif %}">
+        <div class="container">
             <div class="header">
                 <h1>Equipamiento</h1>
                 <button class="button" onclick="location.href='/equipamiento'">Nuevo Equipamiento</button>
@@ -206,85 +212,97 @@
 
             <!-- Tabla de resultados de equipamiento -->
             {% if equipamientos %}
-            <table>
-                <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Actividad</th>
-                    <th>Descripcion</th>
-                    <th>Costo</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for equipamiento in equipamientos %}
-                <tr>
-                    <td>{{ equipamiento.idEquipamiento }}</td>
-                    <td>{{ equipamiento.idActividad }}</td>
-                    <td>{{ equipamiento.descripcion }}</td>
-                    <td>{{ equipamiento.costo }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Actividad</th>
+                        <th>Descripcion</th>
+                        <th>Costo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for equipamiento in equipamientos %}
+                        <tr>
+                            <td>{{ equipamiento.idEquipamiento }}</td>
+                            <td>{{ equipamiento.idActividad }}</td>
+                            <td>{{ equipamiento.descripcion }}</td>
+                            <td>{{ equipamiento.costo }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
-            <p>No se encontraron equipamientos.</p>
+                <p>No se encontraron equipamientos.</p>
             {% endif %}
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
 
     <div id="instructores" class="tab-content">
         <div class="container">
             <div class="header">
                 <h1>Instructores</h1>
-                <button class="button">Nuevo Instructores</button>
+                <button class="button" onclick="location.href='/instructor'">Nuevo Instructor</button>
             </div>
-            <form id="instructorForm" method="POST" action="/instructor">
-                <div class="form-group">
-                    <label for="ci">Cédula:</label>
-                    <input type="text" id="ci" name="ci" placeholder="CI">
-                </div>
+
+            <!-- Formulario de búsqueda -->
+            <form method="post" action="/pestañas">
                 <div class="form-group">
                     <label for="nombreInstructor">Nombre:</label>
-                    <input type="text" id="nombreInstructor" name="nombre" placeholder="Nombre">
+                    <input type="text" id="nombreInstructor" name="nombreInstructor" placeholder="Nombre">
                 </div>
                 <div class="form-group">
                     <label for="apellidoInstructor">Apellido:</label>
-                    <input type="text" id="apellidoInstructor" name="apellido" placeholder="Apellido">
+                    <input type="text" id="apellidoInstructor" name="apellidoInstructor" placeholder="Apellido">
                 </div>
-                <button type="submit" class="search-button">Buscar</button>
+                <div class="form-group">
+                    <label for="ci">CI:</label>
+                    <input type="text" id="ci" name="ci" placeholder="CI">
+                </div>
+                <button class="search-button" type="submit">Buscar</button>
             </form>
 
-            {% if instructores %}
-            <table>
-                <thead>
-                <tr>
-                    <th>Cédula</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for instructor in instructores %}
-                <tr>
-                    <td>{{ instructor.ciInstructor }}</td>
-                    <td>{{ instructor.nombre }}</td>
-                    <td>{{ instructor.apellido }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>No se encontraron instructores.</p>
+            <!-- Tabla de resultados -->
+            {% if instructores_resultados %}
+                <table border="1" style="width: 100%; margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>CI</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for instructor in instructores_resultados %}
+                        <tr>
+                            <td>{{ instructor.nombre }}</td>
+                            <td>{{ instructor.apellido }}</td>
+                            <td>{{ instructor.ci }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% elif 'nombreInstructor' in request.form %}
+                <p style="margin-top: 20px;">No se encontraron resultados.</p>
             {% endif %}
         </div>
     </div>
-
 
     <div id="clases" class="tab-content">
         <div class="container">
             <div class="header">
                 <h1>Clases</h1>
-                <button class="button">Nueva Clase</button>
+                <button class="button" onclick="location.href='/clase'">Nueva Clase</button>
             </div>
             <div class="form-group">
                 <label for="ciInstructor">Instructor:</label>
@@ -300,36 +318,10 @@
             </div>
             <div class="form-group">
                 <label for="dictada">Dictada:</label>
-                <input type="text" id="dictada" name="dictada" placeholder="(0 = No, 1 = Sí)">
+                <input type="text" id="dictada" placeholder="Dictada">
             </div>
-            <button type="submit" class="search-button">Buscar</button>
+            <button class="search-button">Buscar</button>
         </div>
-
-        {% if clases %}
-        <table>
-            <thead>
-            <tr>
-                <th>ID Clase</th>
-                <th>Cédula Instructor</th>
-                <th>ID Actividad</th>
-                <th>ID Turno</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for clase in clases %}
-            <tr>
-                <td>{{ clase.idClase }}</td>
-                <td>{{ clase.idInstructor }}</td>
-                <td>{{ clase.idActividad }}</td>
-                <td>{{ clase.idTurno }}</td>
-                <td>{{ "Sí" if clase.dictada == '1' else "No" }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No se encontraron clases.</p>
-        {% endif %}
     </div>
 </div>
 
