@@ -5,8 +5,12 @@ app = Flask(__name__)
 
 # Función para obtener la conexión a la base de datos
 def get_db_connection():
-    cnx = mysql.connector.connect(user='root', password='obligatorio', host='127.0.0.1', database='obligatorio')
-    return cnx
+    try:
+        cnx = mysql.connector.connect(user='root', password='obligatorio', host='127.0.0.1', database='obligatorio')
+        return cnx
+    except mysql.connector.Error as e:
+        print(f"Error conectando a la base de datos: {e}")
+        return None
 
 @app.route('/')
 def login():
@@ -20,17 +24,22 @@ def registro():
         email = request.form['email']
         password = request.form['password']
 
-        cnx = get_db_connection()
-        cursor = cnx.cursor()
-        query = """
-        INSERT INTO login (nombre, apellido, email, password)
-        VALUES (%s, %s, %s, %s)
-        """
-        cursor.execute(query, (nombre, apellido, email, password))
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        return redirect(url_for('login'))
+        if not (nombre and apellido and email and password):
+            return render_template('registro.html', error="Todos los campos son obligatorios.")
+
+        try:
+            cnx = get_db_connection()
+            if cnx:
+                cursor = cnx.cursor()
+                query = "INSERT INTO login (nombre, apellido, email, password) VALUES (%s, %s, %s, %s)"
+                cursor.execute(query, (nombre, apellido, email, password))
+                cnx.commit()
+                cursor.close()
+                cnx.close()
+            return redirect(url_for('login'))
+        except Exception as e:
+            return render_template('registro.html', error=f"Error al registrar: {e}")
+
     return render_template('registro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -39,149 +48,180 @@ def do_login():
         email = request.form['email']
         password = request.form['password']
 
-        cnx = get_db_connection()
-        cursor = cnx.cursor()
-        query = "SELECT * FROM login WHERE email = %s AND password = %s"
-        cursor.execute(query, (email, password))
-        email = cursor.fetchone()
-        cursor.close()
-        cnx.close()
+        if not (email and password):
+            return render_template('login.html', error="Todos los campos son obligatorios.")
 
-        if email:
-            return redirect(url_for('alumnos'))
-        else:
-            return render_template('login.html', error="email o contraseña incorrectos.")
+        try:
+            cnx = get_db_connection()
+            if cnx:
+                cursor = cnx.cursor()
+                query = "SELECT * FROM login WHERE email = %s AND password = %s"
+                cursor.execute(query, (email, password))
+                user = cursor.fetchone()
+                cursor.close()
+                cnx.close()
+
+                if user:
+                    return redirect(url_for('alumnos'))
+                else:
+                    return render_template('login.html', error="Email o contraseña incorrectos.")
+        except Exception as e:
+            return render_template('login.html', error=f"Error al iniciar sesión: {e}")
+
     return render_template('login.html')
 
 @app.route('/alumnos', methods=['GET', 'POST'])
 def alumnos():
     if request.method == 'POST':
-        nombre = request.form.get('nombre', '')  # Si no existe 'nombre', asignar un valor vacío
-        apellido = request.form.get('apellido', '')  # Lo mismo para 'apellido'
-        actividad = request.form.get('actividad', '')  # Y para 'actividad'
-        alquila = request.form.get('alquila', '')  # Y para 'alquila'
+        nombre = request.form.get('nombre', '')
+        apellido = request.form.get('apellido', '')
+        actividad = request.form.get('actividad', '')
+        alquila = request.form.get('alquila', '')
 
-        # Conectar a la base de datos y hacer la consulta
-        cnx = get_db_connection()
-        cursor = cnx.cursor(dictionary=True)  # Usar dictionary=True para que el resultado sea más fácil de manejar
+        try:
+            cnx = get_db_connection()
+            if cnx:
+                cursor = cnx.cursor(dictionary=True)
+                query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila FROM alumnos WHERE 1=1"
+                params = []
 
-        # Construcción de la consulta base
-        query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila FROM alumnos WHERE 1=1"
+                if nombre:
+                    query += " AND nombre LIKE %s"
+                    params.append(f"%{nombre}%")
+                if apellido:
+                    query += " AND apellido LIKE %s"
+                    params.append(f"%{apellido}%")
+                if actividad:
+                    query += " AND idActividad LIKE %s"
+                    params.append(f"%{actividad}%")
+                if alquila:
+                    query += " AND alquila LIKE %s"
+                    params.append(f"%{alquila}%")
 
-        # Lista para los parámetros de la consulta
-        params = []
+                cursor.execute(query, params)
+                alumnos_result = cursor.fetchall()
+                cursor.close()
+                cnx.close()
 
-        # Agregar condiciones dinámicas si los campos no están vacíos
-        if nombre:
-            query += " AND nombre LIKE %s"
-            params.append('%' + nombre + '%')
+                return render_template('pestañas.html', alumnos=alumnos_result)
+        except Exception as e:
+            return render_template('pestañas.html', error=f"Error al obtener alumnos: {e}")
 
-        if apellido:
-            query += " AND apellido LIKE %s"
-            params.append('%' + apellido + '%')
-
-        if actividad:
-            query += " AND id_actividad LIKE %s"
-            params.append('%' + actividad + '%')
-
-        if alquila:
-            query += " AND alquila LIKE %s"
-            params.append('%' + alquila + '%')
-
-        # Ejecutar la consulta con los parámetros
-        cursor.execute(query, params)
-        alumnos_result = cursor.fetchall()  # Obtener todos los resultados
-        cursor.close()
-        cnx.close()
-
-        return render_template('pestañas.html', alumnos=alumnos_result)
     return render_template('pestañas.html')
 
-    @app.route('/instructor', methods=['GET', 'POST'])
-    def instructor():
-        if request.method == 'POST':
-            ci_instructor = request.form.get('ci', '').strip()
-            nombre = request.form.get('nombre', '').strip()
-            apellido = request.form.get('apellido', '').strip()
+@app.route('/equipamiento', methods=['GET', 'POST'])
+def equipamiento():
+    if request.method == 'POST':
+        id = request.form.get('id', '').strip()
+        actividad = request.form.get('actividad', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+        costo = request.form.get('costo', '').strip()
 
+        try:
             cnx = get_db_connection()
-            cursor = cnx.cursor(dictionary=True)
+            if cnx:
+                cursor = cnx.cursor(dictionary=True)
+                query = "SELECT idEquipamiento, idActividad, descripcion, costo FROM equipamiento WHERE 1=1"
+                params = []
 
-            query = """
+                if id:
+                    query += " AND idEquipamiento LIKE %s"
+                    params.append(f"%{id}%")
+                if actividad:
+                    query += " AND idActividad LIKE %s"
+                    params.append(f"%{actividad}%")
+                if descripcion:
+                    query += " AND descripcion LIKE %s"
+                    params.append(f"%{descripcion}%")
+                if costo:
+                    query += " AND costo LIKE %s"
+                    params.append(f"%{costo}%")
+
+                cursor.execute(query, params)
+                equipamiento_result = cursor.fetchall()
+                cursor.close()
+                cnx.close()
+
+                return render_template('pestañas.html', equipamientos=equipamiento_result)
+        except Exception as e:
+            return render_template('pestañas.html', error=f"Error al obtener equipamiento: {e}")
+
+    return render_template('pestañas.html')
+
+@app.route('/instructor', methods=['GET', 'POST'])
+def instructor():
+    if request.method == 'POST':
+        ci = request.form.get('ci')
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+
+        try:
+            cnx = get_db_connection()
+            if cnx:
+                cursor = cnx.cursor(dictionary=True)
+                query = """
                 SELECT ciInstructor, nombre, apellido
-                FROM instructores
+                FROM instructor
                 WHERE 1=1
-            """
-            params = []
+                """
+                params = []
 
-            if ci_instructor:
-                query += " AND ciInstructor LIKE %s"
-                params.append('%' + ci_instructor + '%')
+                if ci:
+                    query += " AND ciInstructor LIKE %s"
+                    params.append(f"%{ci}%")
+                if nombre:
+                    query += " AND nombre LIKE %s"
+                    params.append(f"%{nombre}%")
+                if apellido:
+                    query += " AND apellido LIKE %s"
+                    params.append(f"%{apellido}%")
 
-            if nombre:
-                query += " AND nombre LIKE %s"
-                params.append('%' + nombre + '%')
+                cursor.execute(query, params)
+                instructores_result = cursor.fetchall()
+                cursor.close()
+                cnx.close()
 
-            if apellido:
-                query += " AND apellido LIKE %s"
-                params.append('%' + apellido + '%')
+                return render_template('pestañas.html', instructores=instructores_result)
+        except Exception as e:
+            return render_template('pestañas.html', error=f"Error al obtener instructores: {e}")
 
-            cursor.execute(query, params)
-            instructores_result = cursor.fetchall()
-            cursor.close()
-            cnx.close()
+    return render_template('pestañas.html')
 
-            return render_template('instructor.html', instructores=instructores_result)
 
-        return render_template('instructor.html')
+@app.route('/clases', methods=['GET', 'POST'])
+def clases():
+    if request.method == 'POST':
+        id_instructor = request.form.get('ciInstructor')
+        actividad = request.form.get('idActividad')
+        turno = request.form.get('turno')
+        dictada = request.form.get('dictada')
 
-    @app.route('/clase', methods=['GET', 'POST'])
-    def clase():
-        if request.method == 'POST':
-            id_clase = request.form.get('id', '').strip()
-            ci_instructor = request.form.get('instructor', '').strip()
-            id_actividad = request.form.get('actividad', '').strip()
-            id_turno = request.form.get('turno', '').strip()
-            dictada = request.form.get('dictada', '').strip()
-
+        try:
             cnx = get_db_connection()
-            cursor = cnx.cursor(dictionary=True)
+            if cnx:
+                cursor = cnx.cursor(dictionary=True)
+                query = """
+                    SELECT * FROM clases
+                    WHERE (idInstructor = %s OR %s IS NULL)
+                    AND (idActividad LIKE %s OR %s IS NULL)
+                    AND (idTurno = %s OR %s IS NULL)
+                    AND (dictada = %s OR %s IS NULL)
+                """
+                cursor.execute(query, (
+                    id_instructor, id_instructor,
+                    f"%{actividad}%", actividad,
+                    turno, turno,
+                    dictada, dictada
+                ))
+                clases_result = cursor.fetchall()
+                cursor.close()
+                cnx.close()
 
-            query = """
-                SELECT idClase, ciInstructor, idActividad, idTurno, dictada
-                FROM clase
-                WHERE 1=1
-            """
-            params = []
+                return render_template('pestañas.html', clases=clases_result)
+        except Exception as e:
+            print(f"Error: {e}")
 
-            if id_clase:
-                query += " AND idClase = %s"
-                params.append(id_clase)
-
-            if ci_instructor:
-                query += " AND ciInstructor = %s"
-                params.append(ci_instructor)
-
-            if id_actividad:
-                query += " AND idActividad = %s"
-                params.append(id_actividad)
-
-            if id_turno:
-                query += " AND idTurno = %s"
-                params.append(id_turno)
-
-            if dictada:
-                query += " AND dictada = %s"
-                params.append(dictada)
-
-            cursor.execute(query, params)
-            clases_result = cursor.fetchall()
-            cursor.close()
-            cnx.close()
-
-            return render_template('clase.html', clases=clases_result)
-
-        return render_template('clase.html')
+    return render_template('pestañas.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
