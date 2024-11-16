@@ -102,7 +102,7 @@ def equipamiento():
     if request.method == 'POST':
         # Obtener los valores del formulario
         id = request.form.get('id', '').strip()
-        actividad = request.form.get('actividad', '').strip()
+        actividadEquipamiento = request.form.get('actividadEquipamiento', '').strip()
         descripcion = request.form.get('descripcion', '').strip()
         costo = request.form.get('costo', '').strip()
 
@@ -121,9 +121,9 @@ def equipamiento():
             query += " AND idEquipamiento LIKE %s"
             params.append('%' + id + '%')
 
-        if actividad:
+        if actividadEquipamiento:
             query += " AND idActividad LIKE %s"
-            params.append('%' + actividad + '%')
+            params.append('%' + actividadEquipamiento + '%')
 
         if descripcion:
             query += " AND descripcion LIKE %s"
