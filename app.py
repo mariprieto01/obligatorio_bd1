@@ -12,6 +12,39 @@ def get_db_connection():
 def login():
     return render_template('login.html')
 
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')  # Asegúrate de tener este archivo HTML
+
+@app.route('/alumnos')
+def alumnos_page():
+    return render_template('alumnos.html')
+
+@app.route('/nuevoAlumno')
+def nuevo_alumno():
+    return render_template('nuevoAlumno.html')
+
+@app.route('/instructor')
+def nuevo_instructor():
+    return render_template('nuevoInstructor.html')
+@app.route('/nuevaClase')
+def nueva_clase():
+    return render_template('nuevaClase.html')
+@app.route('/nuevoEquipamiento')
+def nuevo_equipamiento():
+    return render_template('nuevoEquipamiento.html')
+@app.route('/equipamiento')
+def equipamiento_page():
+    return render_template('equipamiento.html')
+
+@app.route('/clase')
+def clase_page():
+    return render_template('clase.html')
+
+@app.route('/instructores')
+def instructores_page():
+    return render_template('instructores.html')
+
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
@@ -48,102 +81,185 @@ def do_login():
         cnx.close()
 
         if email:
-            return redirect(url_for('alumnos'))
+            return redirect(url_for('dashboard'))
         else:
             return render_template('login.html', error="email o contraseña incorrectos.")
     return render_template('login.html')
 
-@app.route('/alumnos', methods=['GET', 'POST'])
-def alumnos():
-    if request.method == 'POST':
-        nombre = request.form.get('nombre', '')  # Si no existe 'nombre', asignar un valor vacío
-        apellido = request.form.get('apellido', '')  # Lo mismo para 'apellido'
-        actividad = request.form.get('actividad', '')  # Y para 'actividad'
-        alquila = request.form.get('alquila', '')  # Y para 'alquila'
+@app.route('/buscar_instructores', methods=['POST'])
+def buscar_instructores():
+    # Obtener los valores del formulario
+    nombre = request.form.get('nombreInstructor', '').strip()
+    apellido = request.form.get('apellidoInstructor', '').strip()
+    ci = request.form.get('ci', '').strip()
 
-        # Conectar a la base de datos y hacer la consulta
-        cnx = get_db_connection()
-        cursor = cnx.cursor(dictionary=True)  # Usar dictionary=True para que el resultado sea más fácil de manejar
+    # Conectar a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
 
-        # Construcción de la consulta base
-        query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila FROM alumnos WHERE 1=1"
+    # Consulta base
+    query = "SELECT ciInstructor, nombre, apellido"
+    query += " FROM instructores"
+    query += " WHERE 1=1"
+    params = []
 
-        # Lista para los parámetros de la consulta
-        params = []
+    # Agregar condiciones dinámicas si los campos no están vacíos
+    if ci:
+        query += " AND ciInstructor LIKE %s"
+        params.append('%' + ci + '%')
 
-        # Agregar condiciones dinámicas si los campos no están vacíos
-        if nombre:
-            query += " AND nombre LIKE %s"
-            params.append('%' + nombre + '%')
+    if nombre:
+        query += " AND nombre LIKE %s"
+        params.append('%' + nombre + '%')
 
-        if apellido:
-            query += " AND apellido LIKE %s"
-            params.append('%' + apellido + '%')
+    if apellido:
+        query += " AND apellido LIKE %s"
+        params.append('%' + apellido + '%')
 
-        if actividad:
-            query += " AND id_actividad LIKE %s"
-            params.append('%' + actividad + '%')
+    # Ejecutar la consulta
+    cursor.execute(query, params)
+    instructores_result = cursor.fetchall()
+    cursor.close()
+    cnx.close()
 
-        if alquila:
-            query += " AND alquila LIKE %s"
-            params.append('%' + alquila + '%')
+    # Pasar los resultados a la plantilla
+    return render_template('instructores.html', instructores=instructores_result)
 
-        # Ejecutar la consulta con los parámetros
-        cursor.execute(query, params)
-        alumnos_result = cursor.fetchall()  # Obtener todos los resultados
-        cursor.close()
-        cnx.close()
+@app.route('/buscar_alumnos', methods=['POST'])
+def buscar_alumnos():
+    # Obtener los valores del formulario
+    nombre = request.form.get('nombre', '').strip()
+    apellido = request.form.get('apellido', '').strip()
+    descripcion = request.form.get('descripcion', '').strip()
+    alquila = request.form.get('alquila', '').strip()
 
-        return render_template('pestañas.html', alumnos=alumnos_result)
-    return render_template('pestañas.html')
+    # Conectar a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
 
-@app.route('/equipamiento', methods=['GET', 'POST'])
-def equipamiento():
-    if request.method == 'POST':
-        # Obtener los valores del formulario
-        id = request.form.get('id', '').strip()
-        actividadEquipamiento = request.form.get('actividadEquipamiento', '').strip()
-        descripcion = request.form.get('descripcion', '').strip()
-        costo = request.form.get('costo', '').strip()
+    # Consulta base
+    query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, descripcion, alquila"
+    query += " FROM alumnos"
+    query += " INNER JOIN actividades ON actividades.idActividad = alumnos.idActividad"
+    query += " WHERE 1=1"
+    params = []
 
-        # Conectar a la base de datos
-        cnx = get_db_connection()
-        cursor = cnx.cursor(dictionary=True)
+    if nombre:
+        query += " AND nombre LIKE %s"
+        params.append('%' + nombre + '%')
 
-        # Consulta base
-        query = "SELECT idEquipamiento, idActividad, descripcion, costo FROM equipamiento WHERE 1=1"
+    if apellido:
+        query += " AND apellido LIKE %s"
+        params.append('%' + apellido + '%')
 
-        # Lista para los parámetros de la consulta
-        params = []
+    if descripcion:
+        query += " AND descripcion LIKE %s"
+        params.append('%' + descripcion + '%')
 
-        # Agregar condiciones dinámicas si los campos no están vacíos
-        if id:
-            query += " AND idEquipamiento LIKE %s"
-            params.append('%' + id + '%')
+    if alquila:
+        query += " AND alquila LIKE %s"
+        params.append('%' + alquila + '%')
 
-        if actividadEquipamiento:
-            query += " AND idActividad LIKE %s"
-            params.append('%' + actividadEquipamiento + '%')
+    # Ejecutar la consulta
+    cursor.execute(query, params)
+    alumnos_result = cursor.fetchall()
+    cursor.close()
+    cnx.close()
 
-        if descripcion:
-            query += " AND descripcion LIKE %s"
-            params.append('%' + descripcion + '%')
+    # Pasar los resultados a la plantilla
+    return render_template('alumnos.html', alumnos=alumnos_result)
 
-        if costo:
-            query += " AND costo LIKE %s"
-            params.append('%' + costo + '%')
+@app.route('/buscar_equipamiento', methods=['POST'])
+def buscar_equipamiento():
+    # Obtener los valores del formulario
+    id = request.form.get('id', '').strip()
+    descripcion = request.form.get('descripcion', '').strip()
+    actividad = request.form.get('actividad', '').strip()
+    costo = request.form.get('costo', '').strip()
 
-        # Ejecutar la consulta con los parámetros
-        cursor.execute(query, params)
-        equipamiento_result = cursor.fetchall()  # Obtener todos los resultados
-        cursor.close()
-        cnx.close()
+    # Conectar a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
 
-        # Pasar los resultados a la plantilla
-        return render_template('pestañas.html', equipamientos=equipamiento_result)
+    # Consulta base
+    query = "SELECT idEquipamiento, descripcion, costo, idActividad"
+    query += " FROM equipamiento"
+    query += " WHERE 1=1"
+    params = []
 
-    # Si la solicitud es GET, simplemente renderizamos la página vacía
-    return render_template('pestañas.html')
+    # Agregar condiciones dinámicas si los campos no están vacíos
+    if id:
+        query += " AND idEquipamiento LIKE %s"
+        params.append('%' + id + '%')
+
+    if descripcion:
+        query += " AND descripcion LIKE %s"
+        params.append('%' + descripcion + '%')
+
+    if actividad:
+        query += " AND idActividad LIKE %s"
+        params.append('%' + actividad + '%')
+
+    if costo:
+        query += " AND costo LIKE %s"
+        params.append('%' + costo + '%')
+
+    # Ejecutar la consulta
+    cursor.execute(query, params)
+    equipamiento_result = cursor.fetchall()
+    cursor.close()
+    cnx.close()
+
+    # Pasar los resultados a la plantilla
+    return render_template('equipamiento.html', equipamiento=equipamiento_result)
+
+@app.route('/buscar_clases', methods=['POST'])
+def buscar_clases():
+    # Obtener los valores del formulario
+    nombre = request.form.get('nombre', '').strip()
+    actividad_clase = request.form.get('actividad_clase', '').strip()
+    turno = request.form.get('turno', '').strip()
+    dictada = request.form.get('dictada', '').strip()
+
+    # Conectar a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
+
+    # Consulta base
+    query = "select idClase, idTurno, dictada, descripcion, nombre"
+    query += " FROM clase"
+    query += " inner join actividades a on clase.idActividad = a.idActividad"
+    query += " inner join instructores i on clase.ciInstructor = i.ciInstructor"
+    query += " WHERE 1=1"
+
+    params = []
+
+    # Agregar condiciones dinámicas si los campos no están vacíos
+    if nombre:
+        query += " AND nombre LIKE %s"
+        params.append('%' + nombre + '%')
+
+    if actividad_clase:
+        query += " AND a.descripcion LIKE %s"
+        params.append('%' + actividad_clase + '%')
+
+    if turno:
+        query += " AND IdTurno LIKE %s"
+        params.append('%' + turno + '%')
+
+    if dictada:
+        query += " AND dictada LIKE %s"
+        params.append('%' + dictada + '%')
+
+    # Ejecutar la consulta
+    cursor.execute(query, params)
+    clases_result = cursor.fetchall()
+    cursor.close()
+    cnx.close()
+
+    # Pasar los resultados a la plantilla
+    return render_template('clase.html', clases=clases_result)
+
 
 
 

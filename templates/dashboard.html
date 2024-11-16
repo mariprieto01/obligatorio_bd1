@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Club de Ski</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        nav {
+            width: 200px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        nav button:hover {
+            background-color: #444;
+        }
+
+        iframe {
+            flex-grow: 1;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <h2>Club de Ski</h2>
+    <button onclick="navigate('/alumnos')">Alumnos</button>
+    <button onclick="navigate('/equipamiento')">Equipamiento</button>
+    <button onclick="navigate('/clase')">Clases</button>
+    <button onclick="navigate('/instructores')">Instructores</button>
+</nav>
+<iframe src="/alumnos" id="contentFrame"></iframe>
+
+
+<script>
+    function navigate(route) {
+        document.getElementById('contentFrame').src = route;
+    }
+</script>
+</body>
+</html>
