@@ -87,6 +87,59 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            text-decoration: none;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .buttonYellow {
+            background-color: #FFC107;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .buttonYellow:hover {
+            background-color: #ffb300;
+        }
     </style>
 </head>
 <body>
@@ -99,7 +152,7 @@
         <form action="/buscar_equipamiento" method="POST">
             <div class="form-group">
                 <label for="titulo">Equipamiento:</label>
-                <input type="text" id="titulo" name="titulo" placeholder="Nombre del equipamiento">
+                <input type="text" id="idEquipamiento" name="idEquipamiento" placeholder="Nombre del equipamiento">
             </div>
             <div class="form-group">
                 <label for="descripcion">Descripción:</label>
@@ -107,7 +160,7 @@
             </div>
             <div class="form-group">
                 <label for="actividad-eq">Actividad:</label>
-                <input type="text" id="actividad-eq" name="actividad-eq" placeholder="Actividad relacionada">
+                <input type="actividad" id="actividad" name="actividad-eq" placeholder="Actividad relacionada">
             </div>
             <div class="form-group">
                 <label for="costo">Costo:</label>
@@ -127,15 +180,24 @@
                     <th>Descripción</th>
                     <th>Actividad</th>
                     <th>Costo</th>
+                    <th>Acciones</th> <!-- Columna para acciones -->
                 </tr>
                 </thead>
                 <tbody>
                 {% for item in equipamiento %}
                     <tr>
-                        <td>{{ item.id }}</td>
+                        <td>{{ item.idEquipamiento }}</td>
                         <td>{{ item.descripcion }}</td>
-                        <td>{{ item.actividad }}</td>
+                        <td>{{ item.idActividad }}</td>
                         <td>{{ item.costo }}</td>
+                        <td>
+                            <!-- Formulario para eliminar -->
+                            <form action="/eliminar_equipamiento/{{ item.idEquipamiento }}" method="POST" style="display:inline;">
+                                <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
+                            </form>
+                            <!-- Botón para editar -->
+                            <button class="buttonYellow" onclick="openModal({{ item.idEquipamiento }}, '{{ item.costo }}', '{{ item.descripcion }}', '{{ item.idActividad }}')">Modificar</button>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -143,5 +205,48 @@
         </div>
     {% endif %}
 </div>
+
+<!-- Modal para editar equipamiento -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Editar Equipamiento</h2>
+        <form id="editForm" action="/editar_equipamiento" method="POST">
+            <input type="hidden" id="idModal"  name="idModal">
+            <div class="form-group">
+                <label for="costo">Costo:</label>
+                <input type="text" id="costoModal" name="costo" required>
+            </div>
+            <div class="form-group">
+                <label for="descripcion">Descripción:</label>
+                <input type="text" id="descripcionModal" name="descripcion" required>
+            </div>
+            <div class="form-group">
+                <label for="actividad">Actividad:</label>
+                <input type="text" id="actividadModal" name="actividad" required>
+            </div>
+            <button type="submit" class="button">Modificar</button>
+            <button type="button" class="button" onclick="closeModal()">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Función para abrir el modal y cargar los datos
+    function openModal(id, costo, descripcion, actividad) {
+        document.getElementById('idModal').value = id;  // Cargar el ID en el campo oculto
+        document.getElementById('costoModal').value = costo;
+        document.getElementById('descripcionModal').value = descripcion;
+        document.getElementById('actividadModal').value = actividad;
+        document.getElementById('editModal').style.display = "block";
+    }
+
+
+    // Función para cerrar el modal
+    function closeModal() {
+        document.getElementById('editModal').style.display = "none";
+    }
+</script>
+
 </body>
 </html>

@@ -260,8 +260,89 @@ def buscar_clases():
     # Pasar los resultados a la plantilla
     return render_template('clase.html', clases=clases_result)
 
+@app.route('/eliminar_alumno/<int:ciAlumno>', methods=['POST'])
+def eliminar_alumno(ciAlumno):
+    print(f"Eliminando alumno con CI: {ciAlumno}")  # Añadir para depurar
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "DELETE FROM alumnos WHERE ciAlumno = %s"
+    cursor.execute(query, (ciAlumno,))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return redirect(url_for('alumnos_page'))
 
+@app.route('/editar_alumno', methods=['POST'])
+def editar_alumno():
+    ciAlumno = request.form['ciAlumno']
+    nombre = request.form['nombre']
+    apellido = request.form['apellido']
+    alquila = request.form['alquila']
 
+    # Conectar a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    if alquila.lower() == "0":
+        alquila = 0 # 'true' o '1' se convierte a 1
+    else:
+        alquila = 1
+
+    # Actualizar la información del alumno en la base de datos
+    # Actualizar la información del alumno en la base de datos
+    query = "UPDATE alumnos"
+    query += " SET nombre = %s, apellido = %s, alquila = %s"
+    query += " WHERE ciAlumno = %s"
+
+    # Asegúrate de que también pases 'ciAlumno' como parámetro
+    cursor.execute(query, (nombre, apellido, alquila, ciAlumno))
+
+    cnx.commit()
+
+    # Cerrar la conexión y redirigir de nuevo a la página de alumnos
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('alumnos_page'))
+
+@app.route('/eliminar_equipamiento/<int:idEquipamiento>', methods=['POST'])
+def eliminar_equipamiento(idEquipamiento):
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "DELETE FROM equipamiento WHERE idEquipamiento = %s"
+    cursor.execute(query, (idEquipamiento,))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return redirect(url_for('equipamiento_page'))
+
+@app.route('/editar_equipamiento', methods=['POST'])
+def editar_equipamiento():
+    idEquipamiento = request.form['idModal']  # Asegúrate de que este campo esté en el formulario
+    descripcion = request.form['descripcion']
+    costo = request.form['costo']
+    actividad = request.form['actividad']
+
+    # Conectar a la base
+    print(f"ID Equipamiento recibido: {idEquipamiento}")
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    # Actualizar la información del equipamiento en la base de datos
+    query = "UPDATE equipamiento"
+    query += " SET descripcion = %s, costo = %s, idActividad = %s"
+    query += " WHERE idEquipamiento = %s"
+    cursor.execute(query, (descripcion, costo, actividad, idEquipamiento))
+
+    cnx.commit()
+
+    # Cerrar la conexión
+    cursor.close()
+    cnx.close()
+    print(f"Ejecutando consulta: {query % (descripcion, costo, actividad, idEquipamiento)}")  # Esto muestra la query con los valores
+
+    # Redirigir a la página de equipamiento después de la actualización
+    return redirect(url_for('equipamiento_page'))
 
 
 if __name__ == '__main__':
