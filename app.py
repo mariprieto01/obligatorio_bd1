@@ -260,9 +260,92 @@ def buscar_clases():
     # Pasar los resultados a la plantilla
     return render_template('clase.html', clases=clases_result)
 
+@app.route('/nuevo_alumno', methods=['GET', 'POST'])
+def nuevo_alumno():
+    if request.method == 'POST':
+        ciAlumno = request.form['ciAlumno']
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        idActividad = request.form['id_actividad']
+        alquila = request.form['alquila']
 
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = """
+        INSERT INTO alumnos (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
 
+        return redirect(url_for('alumnos'))
+    return render_template('nuevoAlumno.html')
 
+@app.route('/nuevo_instructor', methods=['GET', 'POST'])
+def nuevo_instructor():
+    if request.method == 'POST':
+        ciInstructor = request.form['ciInstructor']
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = """
+        INSERT INTO instructores (ciInstructor, nombre, apellido)
+        VALUES (%s, %s, %s)
+        """
+        cursor.execute(query, (ciInstructor, nombre, apellido))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return redirect(url_for('alumnos'))
+    return render_template('nuevoInstructor.html')
+
+@app.route('/nueva_clase', methods=['GET', 'POST'])
+def nueva_clase():
+    if request.method == 'POST':
+        idClase = request.form['idClase']
+        ciInstructor = request.form['ciInstructor']
+        idActividad = request.form['idActividad']
+        idTurno = request.form['idTurno']
+        dictada = request.form['dictada']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = """
+        INSERT INTO clase (idClase, ciInstructor, idActividad, idTurno, dictada)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (idClase, ciInstructor, idActividad, idTurno, dictada))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return redirect(url_for('alumnos'))
+    return render_template('nuevaClase.html')
+
+@app.route('/nuevo_equipamiento', methods=['GET', 'POST'])
+def nuevo_equipamiento():
+    if request.method == 'POST':
+        idEquipamiento = request.form['idEquipamiento']
+        idActividad = request.form['idActividad']
+        descripcion = request.form['descripcion']
+        costo = request.form['costo']
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        query = """
+        INSERT INTO equipamiento (idEquipamiento, idActividad, descripcion, costo)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (idEquipamiento, idActividad, descripcion, costo))
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return redirect(url_for('alumnos'))
+    return render_template('nuevoEquipamiento.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
