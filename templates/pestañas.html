@@ -150,7 +150,6 @@
                 <button type="submit" class="search-button">Buscar</button>
             </form>
 
-            <!-- Tabla de alumnos si hay resultados -->
             {% if alumnos %}
                 <table>
                     <thead>
@@ -182,8 +181,6 @@
         </div>
     </div>
 
-
-
     <div id="equipamiento" class="tab-content {% if request.form.get('tipo') %}active{% endif %}">
         <div class="container">
             <div class="header">
@@ -192,48 +189,60 @@
             </div>
 
             <!-- Formulario de búsqueda de equipamiento -->
-            <form method="post" action="/pestañas">
+            <form method="POST" action="/equipamiento">
                 <div class="form-group">
-                    <label for="tipo">Tipo:</label>
-                    <input type="text" id="tipo" name="tipo" placeholder="Tipo de equipamiento" value="{{ request.form.get('tipo', '') }}">
+                    <label for="id">Id:</label>
+                    <input type="text" id="id" name="id" placeholder="Id">
                 </div>
                 <div class="form-group">
-                    <label for="estado">Estado:</label>
-                    <input type="text" id="estado" name="estado" placeholder="Estado del equipamiento" value="{{ request.form.get('estado', '') }}">
+                    <label for="actividadEquipamiento">Actividad:</label>
+                    <input type="text" id="actividadEquipamiento" name="actividadEquipamiento" placeholder="Actividad">
                 </div>
                 <div class="form-group">
-                    <label for="talle">Talle:</label>
-                    <input type="text" id="talle" name="talle" placeholder="Talle del equipamiento" value="{{ request.form.get('talle', '') }}">
+                    <label for="descripcion">Descripcion:</label>
+                    <input type="text" id="descripcion" name="descripcion" placeholder="Descripcion">
                 </div>
-                <input type="hidden" name="tab" value="equipamiento">
-                <button class="search-button" type="submit">Buscar</button>
+                <div class="form-group">
+                    <label for="costo">Costo:</label>
+                    <input type="text" id="costo" name="costo" placeholder="Costo">
+                </div>
+                <button type="submit" class="search-button">Buscar</button>
             </form>
 
+
             <!-- Tabla de resultados de equipamiento -->
-            {% if equipamiento_resultados %}
-                <table border="1" style="width: 100%; margin-top: 20px;">
+            {% if equipamientos %}
+                <table>
                     <thead>
                     <tr>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Talle</th>
+                        <th>Id</th>
+                        <th>Actividad</th>
+                        <th>Descripcion</th>
+                        <th>Costo</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for equipo in equipamiento_resultados %}
+                    {% for equipamiento in equipamientos %}
                         <tr>
-                            <td>{{ equipo.tipo }}</td>
-                            <td>{{ equipo.estado }}</td>
-                            <td>{{ equipo.talle }}</td>
+                            <td>{{ equipamiento.idEquipamiento }}</td>
+                            <td>{{ equipamiento.idActividad }}</td>
+                            <td>{{ equipamiento.descripcion }}</td>
+                            <td>{{ equipamiento.costo }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-            {% elif request.form.get('tipo') is not none %}
-                <p style="margin-top: 20px;">No se encontraron resultados.</p>
+            {% else %}
+                <p>No se encontraron equipamientos.</p>
             {% endif %}
         </div>
     </div>
+
+
+
+
+
+
 
 
 

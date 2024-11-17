@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clases</title>
+    <style>
+        /* Aquí puedes incluir el mismo estilo CSS o ajustarlo según sea necesario */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-button {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .search-button:hover {
+            background-color: #007bb5;
+        }
+
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .tabla thead tr {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .tabla th, .tabla td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+        .tabla tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .tabla tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+<div id="clases" class="tab-content">
+    <div class="container">
+        <div class="header">
+            <h1>Clases</h1>
+            <button class="button" onclick="window.location.href='/nuevaClase'">Nueva clase</button>
+        </div>
+        <form action="/buscar_clases" method="POST">
+            <div class="form-group">
+                <label for="ciInstructor">CI del Instructor:</label>
+                <input type="text" id="ciInstructor" name="ciInstructor" placeholder="CI del instructor">
+            </div>
+            <div class="form-group">
+                <label for="actividad-clase">Actividad:</label>
+                <input type="text" id="actividad-clase" name="actividad-clase" placeholder="Actividad">
+            </div>
+            <div class="form-group">
+                <label for="turno">Turno:</label>
+                <input type="text" id="turno" name="turno" placeholder="Turno">
+            </div>
+            <div class="form-group">
+                <label for="dictada">Dictada:</label>
+                <input type="text" id="dictada" name="dictada" placeholder="Dictada">
+            </div>
+            <button class="search-button" type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <!-- Tabla dinámica para mostrar los resultados -->
+    {% if clases %}
+        <div class="table-container">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>CI Instructor</th>
+                    <th>Actividad</th>
+                    <th>Turno</th>
+                    <th>Dictada</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for clase in clases %}
+                    <tr>
+                        <td>{{ clase.nombre }}</td>
+                        <td>{{ clase.descripcion }}</td>
+                        <td>{{ clase.turno }}</td>
+                        <td>{{ clase.dictada }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
