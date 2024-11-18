@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de consultas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        h1, h3 {
+            color: #333;
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-data {
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Reporte de Consultas</h1>
+
+    <h3>Actividades con más ingresos generados</h3>
+    {% if ingresos %}
+    <table>
+        <thead>
+        <tr>
+            <th>Actividad</th>
+            <th>Ingresos generados</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in ingresos %}
+        <tr>
+            <td>{{ item.actividad }}</td>
+            <td>{{ item.ingresos }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">No hay datos disponibles para los ingresos generados.</p>
+    {% endif %}
+
+    <h3>Actividades con más alumnos</h3>
+    {% if alumnos %}
+    <table>
+        <thead>
+        <tr>
+            <th>Actividad</th>
+            <th>Cantidad de alumnos</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in alumnos %}
+        <tr>
+            <td>{{ item.actividad }}</td>
+            <td>{{ item.cantidad_alumnos }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">No hay datos disponibles para la cantidad de alumnos.</p>
+    {% endif %}
+
+    <h3>Turnos con más clases dictadas</h3>
+    {% if turnos %}
+    <table>
+        <thead>
+        <tr>
+            <th>Turno</th>
+            <th>Hora inicio</th>
+            <th>Hora fin</th>
+            <th>Clases dictadas</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in turnos %}
+        <tr>
+            <td>{{ item.turno }}</td>
+            <td>{{ item.inicio }}</td>
+            <td>{{ item.fin }}</td>
+            <td>{{ item.clases_dictadas }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">No hay datos disponibles para los turnos con clases dictadas.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

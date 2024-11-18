@@ -260,92 +260,133 @@ def buscar_clases():
     # Pasar los resultados a la plantilla
     return render_template('clase.html', clases=clases_result)
 
-@app.route('/nuevo_alumno', methods=['GET', 'POST'])
-def nuevo_alumno():
-    if request.method == 'POST':
-        ciAlumno = request.form['ciAlumno']
-        nombre = request.form['nombre']
-        apellido = request.form['apellido']
-        fecha_nacimiento = request.form['fecha_nacimiento']
-        idActividad = request.form['id_actividad']
-        alquila = request.form['alquila']
+@app.route('/eliminar_alumno/<int:ciAlumno>', methods=['POST'])
+def eliminar_alumno(ciAlumno):
+    print(f"Eliminando alumno con CI: {ciAlumno}")  # Añadir para depurar
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "DELETE FROM alumnos WHERE ciAlumno = %s"
+    cursor.execute(query, (ciAlumno,))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return redirect(url_for('alumnos_page'))
 
-        cnx = get_db_connection()
-        cursor = cnx.cursor()
-        query = """
-        INSERT INTO alumnos (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila)
-        VALUES (%s, %s, %s, %s, %s, %s)
+@app.route('/editar_alumno', methods=['POST'])
+def editar_alumno():
+    ciAlumno = request.form['ciAlumno']
+    nombre = request.form['nombre']
+    apellido = request.form['apellido']
+    alquila = request.form['alquila']
+
+    # Conectar a la base de datos
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    if alquila.lower() == "0":
+        alquila = 0 # 'true' o '1' se convierte a 1
+    else:
+        alquila = 1
+
+    # Actualizar la información del alumno en la base de datos
+    # Actualizar la información del alumno en la base de datos
+    query = "UPDATE alumnos"
+    query += " SET nombre = %s, apellido = %s, alquila = %s"
+    query += " WHERE ciAlumno = %s"
+
+    # Asegúrate de que también pases 'ciAlumno' como parámetro
+    cursor.execute(query, (nombre, apellido, alquila, ciAlumno))
+
+    cnx.commit()
+
+    # Cerrar la conexión y redirigir de nuevo a la página de alumnos
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('alumnos_page'))
+
+@app.route('/eliminar_equipamiento/<int:idEquipamiento>', methods=['POST'])
+def eliminar_equipamiento(idEquipamiento):
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "DELETE FROM equipamiento WHERE idEquipamiento = %s"
+    cursor.execute(query, (idEquipamiento,))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return redirect(url_for('equipamiento_page'))
+
+@app.route('/editar_equipamiento', methods=['POST'])
+def editar_equipamiento():
+    idEquipamiento = request.form['idModal']  # Asegúrate de que este campo esté en el formulario
+    descripcion = request.form['descripcion']
+    costo = request.form['costo']
+    actividad = request.form['actividad']
+
+    # Conectar a la base
+    print(f"ID Equipamiento recibido: {idEquipamiento}")
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    # Actualizar la información del equipamiento en la base de datos
+    query = "UPDATE equipamiento"
+    query += " SET descripcion = %s, costo = %s, idActividad = %s"
+    query += " WHERE idEquipamiento = %s"
+    cursor.execute(query, (descripcion, costo, actividad, idEquipamiento))
+
+    cnx.commit()
+
+    # Cerrar la conexión
+    cursor.close()
+    cnx.close()
+    print(f"Ejecutando consulta: {query % (descripcion, costo, actividad, idEquipamiento)}")  # Esto muestra la query con los valores
+
+    # Redirigir a la página de equipamiento después de la actualización
+    return redirect(url_for('equipamiento_page'))
+
+@app.route('/reporte', methods=['GET'])
+def reporte():
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
+
+    ingresos_query = """
+        SELECT a.descripcion AS actividad, SUM(e.costo) AS ingresos
+        FROM actividades a
+        JOIN equipamiento e ON a.idActividad = e.idActividad
+        JOIN alumno_clase ac ON e.idEquipamiento = ac.idEquipamiento
+        JOIN alumnos al ON ac.ciAlumno = al.ciAlumno
+        WHERE al.alquila = 1
+        GROUP BY a.descripcion
+        ORDER BY ingresos DESC;
+    """
+    cursor.execute(ingresos_query)
+    ingresos = cursor.fetchall()
+
+    alumnos_query = """
+        SELECT a.descripcion AS actividad, COUNT(al.ciAlumno) AS cantidad_alumnos
+        FROM actividades a
+        JOIN alumnos al ON a.idActividad = al.idActividad
+        GROUP BY a.descripcion
+        ORDER BY cantidad_alumnos DESC;
+    """
+    cursor.execute(alumnos_query)
+    alumnos = cursor.fetchall()
+
+    turnos_query = """
+            SELECT t.idTurno AS turno, t.hora_inicio AS inicio, t.hora_fin AS fin, COUNT(c.idClase) AS clases_dictadas
+            FROM turnos t
+            JOIN clase c ON t.idTurno = c.idTurno
+            WHERE c.dictada = 1
+            GROUP BY t.idTurno, t.hora_inicio, t.hora_fin
+            ORDER BY clases_dictadas DESC;
         """
-        cursor.execute(query, (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila))
-        cnx.commit()
-        cursor.close()
-        cnx.close()
+    cursor.execute(turnos_query)
+    turnos = cursor.fetchall()
 
-        return redirect(url_for('alumnos'))
-    return render_template('nuevoAlumno.html')
+    cursor.close()
+    cnx.close()
 
-@app.route('/nuevo_instructor', methods=['GET', 'POST'])
-def nuevo_instructor():
-    if request.method == 'POST':
-        ciInstructor = request.form['ciInstructor']
-        nombre = request.form['nombre']
-        apellido = request.form['apellido']
-
-        cnx = get_db_connection()
-        cursor = cnx.cursor()
-        query = """
-        INSERT INTO instructores (ciInstructor, nombre, apellido)
-        VALUES (%s, %s, %s)
-        """
-        cursor.execute(query, (ciInstructor, nombre, apellido))
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        return redirect(url_for('alumnos'))
-    return render_template('nuevoInstructor.html')
-
-@app.route('/nueva_clase', methods=['GET', 'POST'])
-def nueva_clase():
-    if request.method == 'POST':
-        idClase = request.form['idClase']
-        ciInstructor = request.form['ciInstructor']
-        idActividad = request.form['idActividad']
-        idTurno = request.form['idTurno']
-        dictada = request.form['dictada']
-
-        cnx = get_db_connection()
-        cursor = cnx.cursor()
-        query = """
-        INSERT INTO clase (idClase, ciInstructor, idActividad, idTurno, dictada)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(query, (idClase, ciInstructor, idActividad, idTurno, dictada))
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        return redirect(url_for('alumnos'))
-    return render_template('nuevaClase.html')
-
-@app.route('/nuevo_equipamiento', methods=['GET', 'POST'])
-def nuevo_equipamiento():
-    if request.method == 'POST':
-        idEquipamiento = request.form['idEquipamiento']
-        idActividad = request.form['idActividad']
-        descripcion = request.form['descripcion']
-        costo = request.form['costo']
-
-        cnx = get_db_connection()
-        cursor = cnx.cursor()
-        query = """
-        INSERT INTO equipamiento (idEquipamiento, idActividad, descripcion, costo)
-        VALUES (%s, %s, %s, %s)
-        """
-        cursor.execute(query, (idEquipamiento, idActividad, descripcion, costo))
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        return redirect(url_for('alumnos'))
-    return render_template('nuevoEquipamiento.html')
+    return render_template('reporte.html', ingresos=ingresos, alumnos=alumnos, turnos=turnos)
 
 if __name__ == '__main__':
     app.run(debug=True)
