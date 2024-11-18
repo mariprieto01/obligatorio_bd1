@@ -5,6 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumnos</title>
     <style>
+        /* Estilos del Modal */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -89,7 +126,18 @@
         .tabla tbody tr:hover {
             background-color: #f1f1f1;
         }
+        .buttonYellow {
+            background-color: #FFD700; /* Amarillo suave tipo yema de huevo */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
 
+        .buttonYellow:hover {
+            background-color: #FFCC00; /* Un tono más oscuro para el hover */
+        }
 
     </style>
 </head>
@@ -127,19 +175,30 @@
             <table class="tabla">
                 <thead>
                 <tr>
+                    <th>CI</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Descripcion</th>
                     <th>Alquila</th>
+                    <th>Acciones</th> <!-- Columna para acciones -->
                 </tr>
                 </thead>
                 <tbody>
                 {% for alumno in alumnos %}
                     <tr>
+                        <td>{{ alumno.ciAlumno }}</td>
                         <td>{{ alumno.nombre }}</td>
                         <td>{{ alumno.apellido }}</td>
                         <td>{{ alumno.descripcion }}</td>
                         <td>{{ alumno.alquila }}</td>
+                        <td>
+                            <!-- Formulario para eliminar -->
+                            <form action="/eliminar_alumno/{{ alumno.ciAlumno }}" method="POST" style="display:inline;">
+                                <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
+                            </form>
+                            <!-- Botón para editar -->
+                            <button class="buttonYellow" onclick="openModal({{ alumno.ciAlumno }}, '{{ alumno.nombre }}', '{{ alumno.apellido }}', '{{ alumno.descripcion }}', '{{ alumno.alquila }}')">Modificar</button>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -147,5 +206,52 @@
         </div>
     {% endif %}
 </div>
+
+<!-- Modal para editar alumno -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Editar Alumno</h2>
+        <form id="editForm" action="/editar_alumno" method="POST">
+            <input type="hidden" id="ciAlumno" name="ciAlumno">
+            <div class="form-group">
+                <label for="nombreAlumno">Nombre:</label>
+                <input type="text" id="nombreAlumno" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="apellidoAlumno">Apellido:</label>
+                <input type="text" id="apellidoAlumno" name="apellido" required>
+            </div>
+            <div class="form-group">
+                <label for="descripcionAlumno">Descripcion:</label>
+                <input type="text" id="descripcionAlumno" name="descripcion" required>
+            </div>
+            <div class="form-group">
+                <label for="alquilaAlumno">Alquila:</label>
+                <input type="text" id="alquilaAlumno" name="alquila" required>
+            </div>
+            <button type="submit" class="button">Modificar</button>
+            <button type="button" class="button" onclick="closeModal()">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Función para abrir el modal y cargar los datos
+    function openModal(ci, nombre, apellido, descripcion, alquila) {
+        document.getElementById('ciAlumno').value = ci;
+        document.getElementById('nombreAlumno').value = nombre;
+        document.getElementById('apellidoAlumno').value = apellido;
+        document.getElementById('descripcionAlumno').value = descripcion;
+        document.getElementById('alquilaAlumno').value = alquila;
+        document.getElementById('editModal').style.display = "block";
+    }
+
+    // Función para cerrar el modal
+    function closeModal() {
+        document.getElementById('editModal').style.display = "none";
+    }
+</script>
+
 </body>
 </html>
