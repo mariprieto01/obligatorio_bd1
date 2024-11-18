@@ -218,7 +218,7 @@ def buscar_clases():
     # Obtener los valores del formulario
     nombre = request.form.get('nombre', '').strip()
     actividad_clase = request.form.get('actividad_clase', '').strip()
-    turno = request.form.get('turno', '').strip()
+    idTurno = request.form.get('idTurno', '').strip()
     dictada = request.form.get('dictada', '').strip()
 
     # Conectar a la base de datos
@@ -243,9 +243,9 @@ def buscar_clases():
         query += " AND a.descripcion LIKE %s"
         params.append('%' + actividad_clase + '%')
 
-    if turno:
-        query += " AND IdTurno LIKE %s"
-        params.append('%' + turno + '%')
+    if idTurno:
+        query += " AND idTurno LIKE %s"
+        params.append('%' + idTurno + '%')
 
     if dictada:
         query += " AND dictada LIKE %s"
@@ -459,12 +459,9 @@ def editar_equipamiento():
     costo = request.form['costo']
     actividad = request.form['actividad']
 
-    # Conectar a la base
-    print(f"ID Equipamiento recibido: {idEquipamiento}")
     cnx = get_db_connection()
     cursor = cnx.cursor()
 
-    # Actualizar la información del equipamiento en la base de datos
     query = "UPDATE equipamiento"
     query += " SET descripcion = %s, costo = %s, idActividad = %s"
     query += " WHERE idEquipamiento = %s"
@@ -472,13 +469,84 @@ def editar_equipamiento():
 
     cnx.commit()
 
-    # Cerrar la conexión
     cursor.close()
     cnx.close()
-    print(f"Ejecutando consulta: {query % (descripcion, costo, actividad, idEquipamiento)}")  # Esto muestra la query con los valores
 
-    # Redirigir a la página de equipamiento después de la actualización
     return redirect(url_for('equipamiento_page'))
+
+@app.route('/eliminar_clase/<int:idClase>', methods=['POST'])
+def eliminar_clase(idClase):
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "DELETE FROM clase WHERE idClase = %s"
+    cursor.execute(query, (idClase,))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return redirect(url_for('clase_page'))
+
+@app.route('/editar_clase', methods=['POST'])
+def editar_clase():
+    idClase = request.form['idClase']
+    ciInstructor = request.form['ciInstructor']
+    idActividad = request.form['descripcion']
+    idTurno = request.form['idTurno']
+    dictada = request.form['dictada']
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    if dictada == 'sí':
+        dictada = 1
+    else:
+        dictada = 0
+
+    query = "UPDATE clase"
+    query += " SET ciInstructor = %s, idActividad = %s, idTurno = %s, dictada = %s"
+    query += " WHERE idClase = %s"
+    print(query, (ciInstructor, idActividad, idTurno, dictada, idClase))
+    print(request.form)
+    cursor.execute(query, (idClase, ciInstructor, idActividad, idTurno, dictada))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('clase_page'))
+
+@app.route('/eliminar_instructor/<int:ciInstructor>', methods=['POST'])
+def eliminar_instructor(ciInstructor):
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    query = "DELETE FROM instructores WHERE ciInstructor = %s"
+    cursor.execute(query, (ciInstructor,))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return redirect(url_for('instructores_page'))
+
+@app.route('/editar_instructor', methods=['POST'])
+def editar_instructor():
+    nombreInstructor = request.form['nombre']
+    apellidoInstructor = request.form['apellido']
+    ci = request.form['ciInstructor']
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    query = "UPDATE instructores"
+    query += " SET nombre = %s, apellido = %s"
+    query += " WHERE ciInstructor = %s"
+
+    cursor.execute(query, (nombreInstructor, apellidoInstructor, ci))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('instructores_page'))
 
 if __name__ == '__main__':
     app.run(debug=True)
