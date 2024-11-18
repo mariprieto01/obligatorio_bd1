@@ -260,8 +260,146 @@ def buscar_clases():
     # Pasar los resultados a la plantilla
     return render_template('clase.html', clases=clases_result)
 
+@app.route('/alumno_nuevo', methods=['POST'])
+def alumno_nuevo():
+    ciAlumno = request.form.get('ciAlumno')
+    nombre = request.form.get('nombre')
+    apellido = request.form.get('apellido')
+    fecha_nacimiento = request.form.get('fecha_nacimiento')
+    idActividad = request.form.get('idActividad')
+    alquila = request.form['alquila'].strip()
+
+    if alquila == 'sí':
+        alquila = 1
+    else:
+        alquila = 0
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    check_query = "SELECT * FROM alumnos WHERE ciAlumno = %s"
+    cursor.execute(check_query, (ciAlumno,))
+    alumnoExistente = cursor.fetchone()
+
+    if alumnoExistente:
+        cursor.close()
+        cnx.close()
+        return render_template('nuevoAlumno.html', error="El alumno con esta CI ya existe en la base de datos.")
+
+    query = """
+        INSERT INTO alumnos (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+
+    cursor.execute(query, (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('nuevoAlumno.html', success="Alumno creado con éxito.")
+
+@app.route('/instructor_nuevo', methods=['POST'])
+def instructor_nuevo():
+    ciInstructor = request.form.get('ciInstructor')
+    nombre = request.form.get('nombre')
+    apellido = request.form.get('apellido')
 
 
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    check_query = "SELECT * FROM instructores WHERE ciInstructor = %s"
+    cursor.execute(check_query, (ciInstructor,))
+    instructorExistente = cursor.fetchone()
+
+    if instructorExistente:
+        cursor.close()
+        cnx.close()
+        return render_template('nuevoInstructor.html', error="El instructor con esta CI ya existe en la base de datos.")
+
+    query = """
+        INSERT INTO instructores (ciInstructor, nombre, apellido)
+        VALUES (%s, %s, %s)
+    """
+
+    cursor.execute(query, (ciInstructor, nombre, apellido))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('nuevoInstructor.html', success="Instructor creado con éxito.")
+
+@app.route('/clase_nueva', methods=['POST'])
+def clase_nueva():
+    idClase = request.form.get('idClase')
+    ciInstructor = request.form.get('ciInstructor')
+    idActividad = request.form.get('idActividad')
+    idTurno = request.form.get('idTurno')
+    dictada = request.form.get('dictada').strip()
+
+    if dictada == 'sí':
+        dictada = 1
+    else:
+        dictada = 0
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    check_query = "SELECT * FROM clase WHERE idClase = %s"
+    cursor.execute(check_query, (idClase,))
+    claseExistente = cursor.fetchone()
+
+    if claseExistente:
+        cursor.close()
+        cnx.close()
+        return render_template('nuevaClase.html', error="La clase con este ID ya existe en la base de datos.")
+
+    query = """
+        INSERT INTO clase (idClase, ciInstructor, idActividad, idTurno, dictada)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+
+    cursor.execute(query, (idClase, ciInstructor, idActividad, idTurno, dictada))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('nuevaClase.html', success="Clase creada con éxito.")
+
+@app.route('/equipamiento_nuevo', methods=['POST'])
+def equipamiento_nuevo():
+    idEquipamiento = request.form.get('idEquipamiento')
+    idActividad = request.form.get('idActividad')
+    descripcion = request.form.get('descripcion')
+    costo = request.form.get('costo')
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    check_query = "SELECT * FROM equipamiento WHERE idEquipamiento = %s"
+    cursor.execute(check_query, (idEquipamiento,))
+    equipamientoExistente = cursor.fetchone()
+
+    if equipamientoExistente:
+        cursor.close()
+        cnx.close()
+        return render_template('nuevoEquipamiento.html', error="El equipamiento con este ID ya existe en la base de datos.")
+
+    query = """
+        INSERT INTO equipamiento (idEquipamiento, descripcion, costo, idActividad)
+        VALUES (%s, %s, %s, %s)
+    """
+
+    cursor.execute(query, (idEquipamiento, descripcion, costo, idActividad))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('nuevoEquipamiento.html', success="Equipamiento creado con éxito.")
 
 
 if __name__ == '__main__':
