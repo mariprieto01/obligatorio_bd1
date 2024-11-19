@@ -305,7 +305,7 @@ def editar_alumno():
 
     return redirect(url_for('alumnos_page'))
 
-@app.route('/eliminar_equipamiento/<int:idEquipamiento>', methods=['POST'])
+@app.route('/eliminar_equipamiento/<int:ciAlumno>', methods=['POST'])
 def eliminar_equipamiento(idEquipamiento):
     cnx = get_db_connection()
     cursor = cnx.cursor()
@@ -318,30 +318,35 @@ def eliminar_equipamiento(idEquipamiento):
 
 @app.route('/editar_equipamiento', methods=['POST'])
 def editar_equipamiento():
-    idEquipamiento = request.form['idModal']  # Asegúrate de que este campo esté en el formulario
+    idEquipamiento = request.form['idEquipamiento']
     descripcion = request.form['descripcion']
     costo = request.form['costo']
-    actividad = request.form['actividad']
+    actividad = request.form['y']
 
-    # Conectar a la base
-    print(f"ID Equipamiento recibido: {idEquipamiento}")
+    # Conectar a la base de datos
     cnx = get_db_connection()
     cursor = cnx.cursor()
 
-    # Actualizar la información del equipamiento en la base de datos
-    query = "UPDATE equipamiento"
-    query += " SET descripcion = %s, costo = %s, idActividad = %s"
-    query += " WHERE idEquipamiento = %s"
-    cursor.execute(query, (descripcion, costo, actividad, idEquipamiento))
+    if alquila.lower() == "0":
+        alquila = 0 # 'true' o '1' se convierte a 1
+    else:
+        alquila = 1
+
+    # Actualizar la información del alumno en la base de datos
+    # Actualizar la información del alumno en la base de datos
+    query = "UPDATE alumnos"
+    query += " SET nombre = %s, apellido = %s, alquila = %s"
+    query += " WHERE ciAlumno = %s"
+
+    # Asegúrate de que también pases 'ciAlumno' como parámetro
+    cursor.execute(query, (nombre, apellido, alquila, ciAlumno))
 
     cnx.commit()
 
-    # Cerrar la conexión
+    # Cerrar la conexión y redirigir de nuevo a la página de alumnos
     cursor.close()
     cnx.close()
-    print(f"Ejecutando consulta: {query % (descripcion, costo, actividad, idEquipamiento)}")  # Esto muestra la query con los valores
 
-    # Redirigir a la página de equipamiento después de la actualización
     return redirect(url_for('equipamiento_page'))
 
 

@@ -49,6 +49,8 @@
     <button onclick="navigate('/equipamiento')">Equipamiento</button>
     <button onclick="navigate('/clase')">Clases</button>
     <button onclick="navigate('/instructores')">Instructores</button>
+    <button onclick="navigate('/roles')" >Roles</button>
+
 </nav>
 <iframe src="/alumnos" id="contentFrame"></iframe>
 
@@ -57,6 +59,8 @@
     function navigate(route) {
         document.getElementById('contentFrame').src = route;
     }
+
+
 </script>
 </body>
 </html>
