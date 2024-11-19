@@ -3,7 +3,6 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Función para obtener la conexión a la base de datos
 def get_db_connection():
     cnx = mysql.connector.connect(user='root', password='obligatorio', host='127.0.0.1', database='obligatorio')
     return cnx
@@ -44,6 +43,10 @@ def clase_page():
 @app.route('/instructores')
 def instructores_page():
     return render_template('instructores.html')
+
+@app.route('/actividadesP')
+def actividades_page():
+    return render_template('actividades.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -589,6 +592,94 @@ def reporte():
     cnx.close()
 
     return render_template('reporte.html', ingresos=ingresos, alumnos=alumnos, turnos=turnos)
+
+@app.route('/actividades', methods=['GET'])
+def actividades():
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
+
+    query = "SELECT * FROM actividades"
+    cursor.execute(query)
+    actividades = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('actividades.html', actividades=actividades)
+
+@app.route('/eliminar_actividad/<int:idActividad>', methods=['POST'])
+def eliminar_actividad(idActividad):
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    query = "DELETE FROM actividades WHERE idActividad = %s"
+    cursor.execute(query, (idActividad,))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('actividades'))
+
+@app.route('/editar_actividad', methods=['POST'])
+def editar_actividad():
+    idActividad = request.form['idActividad']
+    descripcion = request.form['descripcion']
+    costo = request.form['costo']
+    restriccionEdad = request.form['restriccionEdad']
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    query = "UPDATE actividades"
+    query += " SET descripcion = %s, costo = %s, restriccionEdad = %s"
+    query += " WHERE idActividad = %s"
+
+    cursor.execute(query, (descripcion, costo, restriccionEdad, idActividad))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('actividades'))
+
+@app.route('/actividad_nueva', methods=['POST'])
+def actividad_nueva():
+    idActividad = request.form['idActividad']
+    descripcion = request.form['descripcion']
+    costo = request.form['costo']
+    restriccionEdad = request.form['restriccionEdad']
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    check_query = "SELECT * FROM actividades WHERE idActividad = %s"
+    cursor.execute(check_query, (idActividad,))
+    actividadExistente = cursor.fetchone()
+
+    if actividadExistente:
+        cursor.close()
+        cnx.close()
+        return redirect(url_for('actividades', error="La actividad con este ID ya existe en la base de datos."))
+
+    query = """
+        INSERT INTO actividades (idActividad, descripcion, costo, restriccionEdad)
+        VALUES (%s, %s, %s, %s)
+    """
+
+    cursor.execute(query, (idActividad, descripcion, costo, restriccionEdad))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('actividades', success="Actividad eliminada con éxito"))
+
+@app.route('/nuevaActividad')
+def nueva_actividad():
+    return render_template('nuevaActividad.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
