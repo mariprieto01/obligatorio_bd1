@@ -44,10 +44,6 @@ def clase_page():
 def instructores_page():
     return render_template('instructores.html')
 
-@app.route('/actividadesP')
-def actividades_page():
-    return render_template('actividades.html')
-
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
@@ -254,13 +250,11 @@ def buscar_clases():
         query += " AND dictada LIKE %s"
         params.append('%' + dictada + '%')
 
-    # Ejecutar la consulta
     cursor.execute(query, params)
     clases_result = cursor.fetchall()
     cursor.close()
     cnx.close()
 
-    # Pasar los resultados a la plantilla
     return render_template('clase.html', clases=clases_result)
 
 @app.route('/alumno_nuevo', methods=['POST'])
@@ -680,6 +674,109 @@ def actividad_nueva():
 @app.route('/nuevaActividad')
 def nueva_actividad():
     return render_template('nuevaActividad.html')
+
+@app.route('/turnos', methods=['GET'])
+def mostrar_turnos():
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    cursor.execute("SELECT * FROM turnos")
+    turnos = cursor.fetchall()
+    cursor.close()
+    cnx.close()
+
+    return render_template('turnos.html', turnos=None)
+
+@app.route('/buscar_turno', methods=['POST'])
+def buscar_turno():
+    id_turno = request.form.get('idTurno', '').strip()
+    hora_inicio = request.form.get('horaInicio', '').strip()
+    hora_fin = request.form.get('horaFin', '').strip()
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
+
+    query = "SELECT * FROM turnos WHERE 1=1"
+    params = []
+
+    if id_turno:
+        query += " AND idTurno LIKE %s"
+        params.append('%' + id_turno + '%')
+
+    if hora_inicio:
+        query += " AND hora_inicio LIKE %s"
+        params.append('%' + hora_inicio + '%')
+
+    if hora_fin:
+        query += " AND hora_fin LIKE %s"
+        params.append('%' + hora_fin + '%')
+
+    cursor.execute(query, params)
+    turnos_result = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('turnos.html', turnos=turnos_result)
+
+
+@app.route('/editar_turno', methods=['POST'])
+def editar_turno():
+    idTurno = request.form['idModal']
+    hora_inicio = request.form['hora_inicio']
+    hora_fin = request.form['hora_fin']
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    query = """
+        UPDATE turnos
+        SET hora_inicio = %s, hora_fin = %s
+        WHERE idTurno = %s
+    """
+    cursor.execute(query, (hora_inicio, hora_fin, idTurno))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('mostrar_turno'))
+
+@app.route('/nuevo_turno', methods=['GET', 'POST'])
+def nuevo_turno():
+    if request.method == 'GET':
+        return render_template('nuevoTurno.html')
+
+    idTurno = request.form.get('idTurno')
+    hora_inicio = request.form.get('hora_inicio')
+    hora_fin = request.form.get('hora_fin')
+
+    if not idTurno or not hora_inicio or not hora_fin:
+        return render_template('nuevoTurno.html', error="Todos los campos son obligatorios.")
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    check_query = "SELECT * FROM turnos WHERE idTurno = %s"
+    cursor.execute(check_query, (idTurno,))
+    turno_existente = cursor.fetchone()
+
+    if turno_existente:
+        cursor.close()
+        cnx.close()
+        return render_template('nuevoTurno.html', error="El turno con este ID ya existe en la base de datos.")
+
+    query = """
+        INSERT INTO turnos (idTurno, hora_inicio, hora_fin)
+        VALUES (%s, %s, %s)
+    """
+    cursor.execute(query, (idTurno, hora_inicio, hora_fin))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('nuevoTurno.html', success="Turno creado con éxito.")
 
 if __name__ == '__main__':
     app.run(debug=True)
