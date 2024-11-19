@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equipamiento</title>
+    <title>Turnos</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -143,57 +143,51 @@
     </style>
 </head>
 <body>
-<div id="equipamiento" class="tab-content">
+<div id="turnos" class="tab-content">
     <div class="container">
         <div class="header">
-            <h1>Equipamiento</h1>
-            <button class="button" onclick="location.href='/nuevoEquipamiento'">Nuevo Equipamiento</button>
+            <h1>Turnos</h1>
+            <button class="button" onclick="location.href='/nuevo_turno'">Nuevo Turno</button>
         </div>
-        <form action="/buscar_equipamiento" method="POST">
+        <form action="/buscar_turno" method="POST">
             <div class="form-group">
-                <label for="idEquipamiento">Equipamiento:</label>
-                <input type="text" id="idEquipamiento" name="idEquipamiento" placeholder="Nombre del equipamiento">
+                <label for="idTurno">ID Turno:</label>
+                <input type="text" id="idTurno" name="idTurno" placeholder="ID del turno">
             </div>
             <div class="form-group">
-                <label for="descripcion">Descripción:</label>
-                <input type="text" id="descripcion" name="descripcion" placeholder="Descripción del equipamiento">
+                <label for="horaInicio">Hora de Inicio:</label>
+                <input type="time" id="horaInicio" name="horaInicio" placeholder="Hora de inicio">
             </div>
             <div class="form-group">
-                <label for="actividad">Actividad:</label>
-                <input type="actividad" id="actividad" name="actividad-eq" placeholder="Actividad relacionada">
-            </div>
-            <div class="form-group">
-                <label for="costo">Costo:</label>
-                <input type="text" id="costo" name="costo" placeholder="Costo del equipamiento">
+                <label for="horaFin">Hora de Fin:</label>
+                <input type="time" id="horaFin" name="horaFin" placeholder="Hora de fin">
             </div>
             <button class="search-button" type="submit">Buscar</button>
         </form>
     </div>
 
-    {% if equipamiento %}
+    {% if turnos %}
         <div class="table-container">
-            <table>
+            <table class="tabla">
                 <thead>
                 <tr>
-                    <th>Equipamiento</th>
-                    <th>Descripción</th>
-                    <th>Actividad</th>
-                    <th>Costo</th>
+                    <th>ID Turno</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
                     <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in equipamiento %}
+                {% for turno in turnos %}
                     <tr>
-                        <td>{{ item.idEquipamiento }}</td>
-                        <td>{{ item.descripcion }}</td>
-                        <td>{{ item.idActividad }}</td>
-                        <td>{{ item.costo }}</td>
+                        <td>{{ turno.idTurno }}</td>
+                        <td>{{ turno.hora_inicio }}</td>
+                        <td>{{ turno.hora_fin }}</td>
                         <td>
-                            <form action="/eliminar_equipamiento/{{ item.idEquipamiento }}" method="POST" style="display:inline;">
+                            <form action="/eliminar_turno/{{ turno.idTurno }}" method="POST" style="display:inline;">
                                 <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
                             </form>
-                            <button class="buttonYellow" onclick="openModal({{ item.idEquipamiento }}, '{{ item.costo }}', '{{ item.descripcion }}', '{{ item.idActividad }}')">Modificar</button>
+                            <button class="buttonYellow" onclick="openModal({{ turno.idTurno }}, '{{ turno.hora_inicio }}', '{{ turno.hora_fin }}')">Modificar</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -205,21 +199,17 @@
 
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Editar Equipamiento</h2>
-        <form id="editForm" action="/editar_equipamiento" method="POST">
-            <input type="hidden" id="idModal"  name="idModal">
+        <span class="close" onclick="closeModal()"></span>
+        <h2>Editar Turno</h2>
+        <form id="editForm" action="/editar_turno" method="POST">
+            <input type="hidden" id="idModal" name="idModal">
             <div class="form-group">
-                <label for="costo">Costo:</label>
-                <input type="text" id="costoModal" name="costo" required>
+                <label for="horaInicioModal">Hora inicio:</label>
+                <input type="time" id="horaInicioModal" name="hora_inicio" required>
             </div>
             <div class="form-group">
-                <label for="descripcion">Descripción:</label>
-                <input type="text" id="descripcionModal" name="descripcion" required>
-            </div>
-            <div class="form-group">
-                <label for="actividad">Actividad:</label>
-                <input type="text" id="actividadModal" name="actividad" required>
+                <label for="horaFinModal">Hora fin:</label>
+                <input type="time" id="horaFinModal" name="hora_fin" required>
             </div>
             <button type="submit" class="button">Modificar</button>
             <button type="button" class="button" onclick="closeModal()">Cancelar</button>
@@ -228,14 +218,12 @@
 </div>
 
 <script>
-    function openModal(id, costo, descripcion, actividad) {
-        document.getElementById('idModal').value = id;  // Cargar el ID en el campo oculto
-        document.getElementById('costoModal').value = costo;
-        document.getElementById('descripcionModal').value = descripcion;
-        document.getElementById('actividadModal').value = actividad;
+    function openModal(id, horaInicio, horaFin) {
+        document.getElementById('idModal').value = id;
+        document.getElementById('horaInicioModal').value = horaInicio;
+        document.getElementById('horaFinModal').value = horaFin;
         document.getElementById('editModal').style.display = "block";
     }
-
 
     function closeModal() {
         document.getElementById('editModal').style.display = "none";

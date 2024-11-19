@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva clase</title>
+    <title>Nuevo turno</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -106,83 +106,47 @@
             opacity: 1;
             top: 50px;
         }
-
-        select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            background-color: #f9f9f9;
-            color: #333;
-            font-size: 16px;
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            cursor: pointer;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-        }
-
-        select option {
-            background: white;
-            color: #333;
-        }
     </style>
 </head>
 <body>
 
+
 {% if success %}
-    <div class="confirmation-message show">{{ success }}</div>
-    <script>
-        setTimeout(function(){
-            window.location.href = '/clase';
-        }, 3000);
-    </script>
+<div class="confirmation-message show">{{ success }}</div>
+<script>
+    setTimeout(function(){
+        window.location.href = '/turnos';
+    }, 3000);
+</script>
 {% endif %}
 
 {% if error %}
-    <div class="confirmation-message show">{{ error }}</div>
-    <script>
-        setTimeout(function(){
-            window.location.href = '/clase';
-        }, 3000);
-    </script>
+<div class="confirmation-message show">{{ error }}</div>
+<script>
+    setTimeout(function(){
+        window.location.href = '/turnos';
+    }, 3000);
+</script>
 {% endif %}
 
 <div class="form-container">
-    <h2>Nueva clase</h2>
-    <form id="claseForm" method="POST" action="/clase_nueva">
+    <h2>Nuevo turno</h2>
+    <form id="turnoForm" method="POST" action="/nuevo_turno">
         <div class="form-group">
-            <label for="id">ID clase:</label>
-            <input type="text" id="idClase" name="idClase" required>
-        </div>
-        <div class="form-group">
-            <label for="instructor">Cédula del instructor:</label>
-            <input type="text" id="ciInstructor" name="ciInstructor" required>
-        </div>
-        <div class="form-group">
-            <label for="actividad">ID actividad:</label>
-            <input type="text" id="idActividad" name="idActividad" required>
-        </div>
-        <div class="form-group">
-            <label for="turno">ID turno:</label>
+            <label for="idTurno">ID turno:</label>
             <input type="text" id="idTurno" name="idTurno" required>
         </div>
         <div class="form-group">
-            <label for="dictada">Dictada:</label>
-            <select id="dictada" name="dictada" required>
-                <option value="" disabled selected>Selecciona una opción:</option>
-                <option value="sí">Sí</option>
-                <option value="no">No</option>
-            </select>
+            <label for="hora_inicio">Hora inicio:</label>
+            <input type="time" id="hora_inicio" name="hora_inicio" required>
+        </div>
+        <div class="form-group">
+            <label for="hora_fin">Hora fin:</label>
+            <input type="time" id="hora_fin" name="hora_fin" required>
         </div>
         <div class="form-buttons">
             <button type="submit" class="submit-button">Ingresar</button>
-            <button type="button" class="cancel-button" onclick="window.location.href='/clase'">Cancelar</button>
+            <button type="button" class="cancel-button" onclick="window.location.href='/turnos'">Cancelar</button>
         </div>
     </form>
 </div>

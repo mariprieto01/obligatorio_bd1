@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumnos</title>
     <style>
-        /* Estilos del Modal */
         .modal {
-            display: none; /* Oculto por defecto */
+            display: none;
             position: fixed;
             z-index: 1;
             left: 0;
@@ -41,7 +40,6 @@
             cursor: pointer;
         }
 
-        /* Estilos generales */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -127,7 +125,7 @@
             background-color: #f1f1f1;
         }
         .buttonYellow {
-            background-color: #FFD700; /* Amarillo suave tipo yema de huevo */
+            background-color: #FFC107;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -136,7 +134,7 @@
         }
 
         .buttonYellow:hover {
-            background-color: #FFCC00; /* Un tono más oscuro para el hover */
+            background-color: #ffb300;
         }
 
     </style>
@@ -146,7 +144,7 @@
     <div class="container">
         <div class="header">
             <h1>Alumnos</h1>
-            <button class="button" onclick="location.href='/nuevoAlumno'">Nuevo Alumno</button> <!-- Botón para nuevo alumno -->
+            <button class="button" onclick="location.href='/nuevoAlumno'">Nuevo Alumno</button>
         </div>
         <form action="/buscar_alumnos" method="POST">
             <div class="form-group">
@@ -169,7 +167,6 @@
         </form>
     </div>
 
-    <!-- Tabla dinámica para mostrar los resultados -->
     {% if alumnos %}
         <div class="table-container">
             <table class="tabla">
@@ -180,7 +177,7 @@
                     <th>Apellido</th>
                     <th>Descripcion</th>
                     <th>Alquila</th>
-                    <th>Acciones</th> <!-- Columna para acciones -->
+                    <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -192,11 +189,9 @@
                         <td>{{ alumno.descripcion }}</td>
                         <td>{{ alumno.alquila }}</td>
                         <td>
-                            <!-- Formulario para eliminar -->
                             <form action="/eliminar_alumno/{{ alumno.ciAlumno }}" method="POST" style="display:inline;">
                                 <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
                             </form>
-                            <!-- Botón para editar -->
                             <button class="buttonYellow" onclick="openModal({{ alumno.ciAlumno }}, '{{ alumno.nombre }}', '{{ alumno.apellido }}', '{{ alumno.descripcion }}', '{{ alumno.alquila }}')">Modificar</button>
                         </td>
                     </tr>
@@ -207,7 +202,6 @@
     {% endif %}
 </div>
 
-<!-- Modal para editar alumno -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -237,7 +231,6 @@
 </div>
 
 <script>
-    // Función para abrir el modal y cargar los datos
     function openModal(ci, nombre, apellido, descripcion, alquila) {
         document.getElementById('ciAlumno').value = ci;
         document.getElementById('nombreAlumno').value = nombre;
@@ -247,7 +240,6 @@
         document.getElementById('editModal').style.display = "block";
     }
 
-    // Función para cerrar el modal
     function closeModal() {
         document.getElementById('editModal').style.display = "none";
     }
