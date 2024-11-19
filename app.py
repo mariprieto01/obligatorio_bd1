@@ -226,7 +226,7 @@ def buscar_clases():
     cursor = cnx.cursor(dictionary=True)
 
     # Consulta base
-    query = "select idClase, idTurno, dictada, descripcion, nombre"
+    query = "select idClase, idTurno, dictada, descripcion, nombre, apellido"
     query += " FROM clase"
     query += " inner join actividades a on clase.idActividad = a.idActividad"
     query += " inner join instructores i on clase.ciInstructor = i.ciInstructor"
@@ -504,10 +504,8 @@ def editar_clase():
     query = "UPDATE clase"
     query += " SET ciInstructor = %s, idActividad = %s, idTurno = %s, dictada = %s"
     query += " WHERE idClase = %s"
-    print(query, (ciInstructor, idActividad, idTurno, dictada, idClase))
-    print(request.form)
-    cursor.execute(query, (idClase, ciInstructor, idActividad, idTurno, dictada))
 
+    cursor.execute(query, (ciInstructor, idActividad, idTurno, dictada, idClase))
     cnx.commit()
 
     cursor.close()
