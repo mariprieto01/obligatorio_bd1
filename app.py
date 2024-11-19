@@ -546,5 +546,49 @@ def editar_instructor():
 
     return redirect(url_for('instructores_page'))
 
+@app.route('/reporte', methods=['GET'])
+def reporte():
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
+
+    ingresos_query = """
+        SELECT a.descripcion AS actividad, SUM(e.costo) AS ingresos
+        FROM actividades a
+        JOIN equipamiento e ON a.idActividad = e.idActividad
+        JOIN alumno_clase ac ON e.idEquipamiento = ac.idEquipamiento
+        JOIN alumnos al ON ac.ciAlumno = al.ciAlumno
+        WHERE al.alquila = 1
+        GROUP BY a.descripcion
+        ORDER BY ingresos DESC;
+    """
+    cursor.execute(ingresos_query)
+    ingresos = cursor.fetchall()
+
+    alumnos_query = """
+        SELECT a.descripcion AS actividad, COUNT(al.ciAlumno) AS cantidad_alumnos
+        FROM actividades a
+        JOIN alumnos al ON a.idActividad = al.idActividad
+        GROUP BY a.descripcion
+        ORDER BY cantidad_alumnos DESC;
+    """
+    cursor.execute(alumnos_query)
+    alumnos = cursor.fetchall()
+
+    turnos_query = """
+            SELECT t.idTurno AS turno, t.hora_inicio AS inicio, t.hora_fin AS fin, COUNT(c.idClase) AS clases_dictadas
+            FROM turnos t
+            JOIN clase c ON t.idTurno = c.idTurno
+            WHERE c.dictada = 1
+            GROUP BY t.idTurno, t.hora_inicio, t.hora_fin
+            ORDER BY clases_dictadas DESC;
+        """
+    cursor.execute(turnos_query)
+    turnos = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('reporte.html', ingresos=ingresos, alumnos=alumnos, turnos=turnos)
+
 if __name__ == '__main__':
     app.run(debug=True)
