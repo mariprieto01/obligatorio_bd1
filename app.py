@@ -635,7 +635,6 @@ def buscar_turno():
 
     return render_template('turnos.html', turnos=turnos_result)
 
-
 @app.route('/editar_turno', methods=['POST'])
 def editar_turno():
     idTurno = request.form['idModal']
@@ -694,6 +693,144 @@ def nuevo_turno():
     cnx.close()
 
     return render_template('nuevoTurno.html', success="Turno creado con éxito.")
+
+@app.route('/eliminar_turno/<int:idTurno>', methods=['POST'])
+def eliminar_turno(idTurno):
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    query = "DELETE FROM turnos WHERE idTurno = %s"
+    cursor.execute(query, (idTurno,))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('mostrar_turnos'))
+
+@app.route('/alumnoClase', methods=['GET'])
+def mostrar_alumnos_clase():
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+    cursor.execute("SELECT * FROM alumno_clase")
+    alumnos_clase = cursor.fetchall()
+    cursor.close()
+    cnx.close()
+
+    return render_template('alumnoClase.html', alumnos_clase=alumnos_clase)
+
+@app.route('/buscar_alumno_clase', methods=['POST'])
+def buscar_alumno_clase():
+    id_clase = request.form.get('idClase', '').strip()
+    ci_alumno = request.form.get('ciAlumno', '').strip()
+    id_equipamiento = request.form.get('idEquipamiento', '').strip()
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor(dictionary=True)
+
+    query = "SELECT * FROM alumno_clase WHERE 1=1"
+    params = []
+
+    if id_clase:
+        query += " AND idClase = %s"
+        params.append(id_clase)
+
+    if ci_alumno:
+        query += " AND ciAlumno = %s"
+        params.append(ci_alumno)
+
+    if id_equipamiento:
+        query += " AND idEquipamiento = %s"
+        params.append(id_equipamiento)
+
+    cursor.execute(query, params)
+    alumnos_result = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+
+    return render_template('alumnoClase.html', alumno_clase=alumnos_result)
+
+@app.route('/editar_alumno_clase', methods=['POST'])
+def editar_alumno_clase():
+    id_clase = request.form['idClase']
+    ci_alumno = request.form['ciAlumno']
+    id_equipamiento = request.form.get('idEquipamiento')
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    query = """
+        UPDATE alumno_clase
+        SET idEquipamiento = %s
+        WHERE idClase = %s AND ciAlumno = %s
+    """
+    cursor.execute(query, (id_equipamiento, id_clase, ci_alumno))
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('mostrar_alumnos_clase'))
+
+@app.route('/nuevo_alumno_clase', methods=['GET', 'POST'])
+def nuevo_alumno_clase():
+    if request.method == 'POST':
+        idClase = request.form.get('idClase')
+        ciAlumno = request.form.get('ciAlumno')
+        idEquipamiento = request.form.get('idEquipamiento') or None
+
+        if not idClase or not ciAlumno:
+            return render_template('nuevoAlumnoClase.html', error="Todos los campos son obligatorios.")
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+
+        check_query = "SELECT * FROM alumno_clase WHERE idClase = %s AND ciAlumno = %s"
+        cursor.execute(check_query, (idClase, ciAlumno))
+        alumno_existente = cursor.fetchone()
+
+        if alumno_existente:
+            cursor.close()
+            cnx.close()
+            return render_template('nuevoAlumnoClase.html', error="El alumno ya existe en esta clase.")
+
+        query = """
+            INSERT INTO alumno_clase (idClase, ciAlumno, idEquipamiento)
+            VALUES (%s, %s, %s)
+        """
+        cursor.execute(query, (idClase, ciAlumno, idEquipamiento))
+        cnx.commit()
+
+        cursor.close()
+        cnx.close()
+
+        return render_template('nuevoAlumnoClase.html', success="Alumno añadido a la clase con éxito.")
+
+    return render_template('nuevoAlumnoClase.html')
+
+@app.route('/eliminar_alumno_clase/<ciAlumno>', methods=['POST'])
+def eliminar_alumno_clase(ciAlumno):
+    idClase = request.form.get('idClase')
+
+    cnx = get_db_connection()
+    cursor = cnx.cursor()
+
+    if idClase:
+        query = "DELETE FROM alumno_clase WHERE ciAlumno = %s AND idClase = %s"
+        cursor.execute(query, (ciAlumno, idClase))
+    else:
+        query = "DELETE FROM alumno_clase WHERE ciAlumno = %s"
+        cursor.execute(query, (ciAlumno,))
+
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    return redirect(url_for('mostrar_alumnos_clase'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
