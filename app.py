@@ -20,6 +20,9 @@ def dashboard():
 def alumnos_page():
     return render_template('alumnos.html')
 
+@app.route('/asignar_rol')
+def asignar_rol_page():
+    return render_template('asignar_rol.html')
 @app.route('/nuevoAlumno')
 def nuevo_alumno():
     return render_template('nuevoAlumno.html')
@@ -53,13 +56,19 @@ def registro():
         email = request.form['email']
         password = request.form['password']
 
+        print(f"Nombre recibido: {nombre}")
+        print(f"Apellido recibido: {apellido}")
+        print(f"Email recibido: {email}")
+        print(f"Contraseña recibida: {password}")
+
         cnx = get_db_connection()
         cursor = cnx.cursor()
         query = """
-        INSERT INTO login (nombre, apellido, email, password)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO login (nombre, apellido, email, password, rol)
+        VALUES (%s, %s, %s, %s, null)
         """
         cursor.execute(query, (nombre, apellido, email, password))
+        print("Consulta ejecutada con éxito.")
         cnx.commit()
         cursor.close()
         cnx.close()
@@ -72,16 +81,21 @@ def do_login():
         email = request.form['email']
         password = request.form['password']
 
+        print(f"Email recibido: {email}")  # Verifica el email recibido
+        print(f"Contraseña recibida: {password}")
+
         cnx = get_db_connection()
         cursor = cnx.cursor()
-        query = "SELECT * FROM login WHERE email = %s AND password = %s"
+        query = "SELECT nombre, rol, email FROM login WHERE email = %s AND password = %s"
         cursor.execute(query, (email, password))
         email = cursor.fetchone()
         cursor.close()
         cnx.close()
-
+        print(f"Resultado de la consulta: {email}")
         if email:
-            return redirect(url_for('dashboard'))
+            rol = email[1]
+            if rol == 'administrador':
+                return redirect(url_for('dashboard'))
         else:
             return render_template('login.html', error="email o contraseña incorrectos.")
     return render_template('login.html')
@@ -260,6 +274,32 @@ def buscar_clases():
     # Pasar los resultados a la plantilla
     return render_template('clase.html', clases=clases_result)
 
+@app.route('/asignar_rol', methods=['GET', 'POST'])
+def asignar_rol():
+    if request.method == 'POST':
+        nombre = request.form['txt']
+        email = request.form['email']
+        rol = request.form['rol']  # Se obtiene el rol (en este caso solo puede ser 'administrador')
+
+        cnx = get_db_connection()
+        cursor = cnx.cursor()
+        print(f"Nombre: {nombre}, Email: {email}, Rol: {rol}")
+        # Query para actualizar el rol del usuario en la base de datos
+        query = "UPDATE login"
+        query += " SET rol = %s"
+        query += " WHERE nombre = %s AND email = %s"
+
+        cursor.execute(query, (rol, nombre, email))
+        cnx.commit()
+
+        cursor.close()
+        cnx.close()
+
+        # Redirigir a la página de asignar rol con un mensaje de éxito
+        return render_template('asignar_rol.html', success="Rol asignado correctamente.")
+
+    # Si es una solicitud GET, solo se renderiza el formulario
+    return render_template('asignar_rol.html')
 
 
 
