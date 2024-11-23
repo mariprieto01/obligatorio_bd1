@@ -140,7 +140,7 @@
     <div class="confirmation-message show">{{ success }}</div>
     <script>
         setTimeout(function(){
-            window.location.href = '/alumnos';
+            window.location.href = '/alumnoClase';
         }, 3000);
     </script>
 {% endif %}
@@ -149,29 +149,25 @@
     <div class="confirmation-message show">{{ error }}</div>
     <script>
         setTimeout(function(){
-            window.location.href = '/alumnos';
+            window.location.href = '/alumnoClase';
         }, 3000);
     </script>
 {% endif %}
 
 <div class="form-container">
-    <h2>Nuevo alumno</h2>
-    <form id="alumnoForm" method="POST" action="/alumno_nuevo">
+    <h2>Nuevo alumno en una clase</h2>
+    <form id="alumnoClaseForm" method="POST" action="/nuevo_alumno_clase">
         <div class="form-group">
-            <label for="ciAlumno">CI:</label>
+            <label for="idClase">ID clase:</label>
+            <input type="text" id="idClase" name="idClase" required>
+        </div>
+        <div class="form-group">
+            <label for="ciAlumno">CI alumno:</label>
             <input type="text" id="ciAlumno" name="ciAlumno" required>
         </div>
         <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required>
-        </div>
-        <div class="form-group">
-            <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" required>
-        </div>
-        <div class="form-group">
-            <label>Fecha de nacimiento:</label>
-            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+            <label for="idEquipamiento">ID equipamiento:</label>
+            <input type="text" id="idEquipamiento" name="idEquipamiento" required>
         </div>
         <div class="form-buttons">
             <button type="submit" class="submit-button">Ingresar</button>

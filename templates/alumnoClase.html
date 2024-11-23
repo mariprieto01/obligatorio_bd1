@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alumnos</title>
+    <title>Alumnos en la clase</title>
     <style>
         .modal {
             display: none;
@@ -140,79 +140,74 @@
     </style>
 </head>
 <body>
-<div id="alumnos" class="tab-content">
+<div id="alumno_clase" class="tab-content">
     <div class="container">
         <div class="header">
-            <h1>Alumnos</h1>
-            <button class="button" onclick="location.href='/nuevoAlumno'">Nuevo Alumno</button>
+            <h1>Alumnos en clases</h1>
+            <button class="button" onclick="location.href='/nuevo_alumno_clase'">Nuevo alumno en la clase</button>
         </div>
-        <form action="/buscar_alumnos" method="POST">
+        <form action="/buscar_alumno_clase" method="POST">
             <div class="form-group">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Nombre">
+                <label for="idClase">ID Clase:</label>
+                <input type="text" id="idClase" name="idClase" placeholder="ID Clase">
             </div>
             <div class="form-group">
-                <label for="apellido">Apellido:</label>
-                <input type="text" id="apellido" name="apellido" placeholder="Apellido">
+                <label for="ciAlumno">CI Alumno:</label>
+                <input type="text" id="ciAlumno" name="ciAlumno" placeholder="CI Alumno">
             </div>
             <div class="form-group">
-                <label for="nacimiento">Fecha de nacimiento:</label>
-                <input type="date" id="nacimiento" name="nacimiento" placeholder="Fecha de nacimiento">
+                <label for="idEquipamiento">ID Equipamiento:</label>
+                <input type="text" id="idEquipamiento" name="idEquipamiento" placeholder="ID Equipamiento">
             </div>
             <button class="search-button" type="submit">Buscar</button>
         </form>
     </div>
 
-    {% if alumnos %}
-        <div class="table-container">
-            <table class="tabla">
-                <thead>
-                <tr>
-                    <th>CI</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Fecha de nacimiento</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for alumno in alumnos %}
-                    <tr>
-                        <td>{{ alumno.ciAlumno }}</td>
-                        <td>{{ alumno.nombre }}</td>
-                        <td>{{ alumno.apellido }}</td>
-                        <td>{{ alumno.nacimiento }}</td>
-                        <td>
-                            <form action="/eliminar_alumno/{{ alumno.ciAlumno }}" method="POST" style="display:inline;">
-                                <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
-                            </form>
-                            <button class="buttonYellow" onclick="openModal({{ alumno.ciAlumno }}, '{{ alumno.nombre }}', '{{ alumno.apellido }}', '{{ alumno.descripcion }}', '{{ alumno.alquila }}')">Modificar</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    {% if alumno_clase %}
+    <table class="tabla">
+        <thead>
+        <tr>
+            <th>ID Clase</th>
+            <th>CI Alumno</th>
+            <th>ID Equipamiento</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for alumno in alumno_clase %}
+        <tr>
+            <td>{{ alumno.idClase }}</td>
+            <td>{{ alumno.ciAlumno }}</td>
+            <td>{{ alumno.idEquipamiento }}</td>
+            <td>
+                <form action="/eliminar_alumno_clase/{{ alumno.ciAlumno }}" method="POST" style="display:inline;">
+                    <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
+                </form>
+                <button class="buttonYellow" onclick="openModal({{ alumno.idClase }}, '{{ alumno.ciAlumno }}', '{{ alumno.idEquipamiento }}')">Modificar</button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 </div>
 
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Editar Alumno</h2>
-        <form id="editForm" action="/editar_alumno" method="POST">
-            <input type="hidden" id="ciAlumno" name="ciAlumno">
+        <h2>Editar Alumno en la clase</h2>
+        <form id="editForm" action="/editar_alumno_clase" method="POST">
             <div class="form-group">
-                <label for="nombreAlumno">Nombre:</label>
-                <input type="text" id="nombreAlumno" name="nombre" required>
+                <label for="idClaseModal">ID Clase:</label>
+                <input type="text" id="idClaseModal" name="idClase">
             </div>
             <div class="form-group">
-                <label for="apellidoAlumno">Apellido:</label>
-                <input type="text" id="apellidoAlumno" name="apellido" required>
+                <label for="ciAlumnoModal">CI Alumno:</label>
+                <input type="text" id="ciAlumnoModal" name="ciAlumno">
             </div>
             <div class="form-group">
-                <label for="nacimientoAlumno">Fecha de nacimiento:</label>
-                <input type="text" id="nacimientoAlumno" name="nacimiento" required>
+                <label for="idEquipamientoModal">ID Equipamiento:</label>
+                <input type="text" id="idEquipamientoModal" name="idEquipamiento">
             </div>
             <button type="submit" class="button">Modificar</button>
             <button type="button" class="button" onclick="closeModal()">Cancelar</button>
@@ -221,11 +216,10 @@
 </div>
 
 <script>
-    function openModal(ci, nombre, apellido, nacimiento) {
-        document.getElementById('ciAlumno').value = ci;
-        document.getElementById('nombreAlumno').value = nombre;
-        document.getElementById('apellidoAlumno').value = apellido;
-        document.getElementById('nacimientoAlumno').value = nacimiento;
+    function openModal(idClase, ciAlumno, idEquipamiento) {
+        document.getElementById('idClaseModal').value = idClase;
+        document.getElementById('ciAlumnoModal').value = ciAlumno;
+        document.getElementById('idEquipamientoModal').value = idEquipamiento || '';
         document.getElementById('editModal').style.display = "block";
     }
 
