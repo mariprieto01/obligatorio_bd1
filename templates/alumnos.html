@@ -156,8 +156,8 @@
                 <input type="text" id="apellido" name="apellido" placeholder="Apellido">
             </div>
             <div class="form-group">
-                <label for="nacimiento">Fecha de nacimiento:</label>
-                <input type="date" id="nacimiento" name="nacimiento" placeholder="Fecha de nacimiento">
+                <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="Fecha de nacimiento">
             </div>
             <button class="search-button" type="submit">Buscar</button>
         </form>
@@ -181,12 +181,12 @@
                         <td>{{ alumno.ciAlumno }}</td>
                         <td>{{ alumno.nombre }}</td>
                         <td>{{ alumno.apellido }}</td>
-                        <td>{{ alumno.nacimiento }}</td>
+                        <td>{{ alumno.fecha_nacimiento }}</td>
                         <td>
                             <form action="/eliminar_alumno/{{ alumno.ciAlumno }}" method="POST" style="display:inline;">
                                 <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
                             </form>
-                            <button class="buttonYellow" onclick="openModal({{ alumno.ciAlumno }}, '{{ alumno.nombre }}', '{{ alumno.apellido }}', '{{ alumno.descripcion }}', '{{ alumno.alquila }}')">Modificar</button>
+                            <button class="buttonYellow" onclick="openModal({{ alumno.ciAlumno }}, '{{ alumno.nombre }}', '{{ alumno.apellido }}', '{{ fecha_nacimiento }}')">Modificar</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -211,8 +211,8 @@
                 <input type="text" id="apellidoAlumno" name="apellido" required>
             </div>
             <div class="form-group">
-                <label for="nacimientoAlumno">Fecha de nacimiento:</label>
-                <input type="text" id="nacimientoAlumno" name="nacimiento" required>
+                <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
             </div>
             <button type="submit" class="button">Modificar</button>
             <button type="button" class="button" onclick="closeModal()">Cancelar</button>
@@ -221,11 +221,11 @@
 </div>
 
 <script>
-    function openModal(ci, nombre, apellido, nacimiento) {
+    function openModal(ci, nombre, apellido, fecha_nacimiento) {
         document.getElementById('ciAlumno').value = ci;
         document.getElementById('nombreAlumno').value = nombre;
         document.getElementById('apellidoAlumno').value = apellido;
-        document.getElementById('nacimientoAlumno').value = nacimiento;
+        document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
         document.getElementById('editModal').style.display = "block";
     }
 

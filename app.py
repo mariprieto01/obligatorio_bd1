@@ -137,15 +137,12 @@ def buscar_instructores():
 def buscar_alumnos():
     nombre = request.form.get('nombre', '').strip()
     apellido = request.form.get('apellido', '').strip()
-    descripcion = request.form.get('descripcion', '').strip()
-    alquila = request.form.get('alquila', '').strip()
 
     cnx = get_db_connection()
     cursor = cnx.cursor(dictionary=True)
 
-    query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento, descripcion, alquila"
+    query = "SELECT ciAlumno, nombre, apellido, fecha_nacimiento"
     query += " FROM alumnos"
-    query += " INNER JOIN actividades ON actividades.idActividad = alumnos.idActividad"
     query += " WHERE 1=1"
     params = []
 
@@ -156,14 +153,6 @@ def buscar_alumnos():
     if apellido:
         query += " AND apellido LIKE %s"
         params.append('%' + apellido + '%')
-
-    if descripcion:
-        query += " AND descripcion LIKE %s"
-        params.append('%' + descripcion + '%')
-
-    if alquila:
-        query += " AND alquila LIKE %s"
-        params.append('%' + alquila + '%')
 
     cursor.execute(query, params)
     alumnos_result = cursor.fetchall()
@@ -282,13 +271,6 @@ def alumno_nuevo():
     nombre = request.form.get('nombre')
     apellido = request.form.get('apellido')
     fecha_nacimiento = request.form.get('fecha_nacimiento')
-    idActividad = request.form.get('idActividad')
-    alquila = request.form['alquila'].strip()
-
-    if alquila == 'sí':
-        alquila = 1
-    else:
-        alquila = 0
 
     cnx = get_db_connection()
     cursor = cnx.cursor()
@@ -307,7 +289,7 @@ def alumno_nuevo():
         VALUES (%s, %s, %s, %s)
     """
 
-    cursor.execute(query, (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila))
+    cursor.execute(query, (ciAlumno, nombre, apellido, fecha_nacimiento))
     cnx.commit()
 
     cursor.close()
@@ -434,21 +416,16 @@ def editar_alumno():
     ciAlumno = request.form['ciAlumno']
     nombre = request.form['nombre']
     apellido = request.form['apellido']
-    alquila = request.form['alquila']
+    fecha_nacimiento = request.form['fecha_nacimiento']
 
     cnx = get_db_connection()
     cursor = cnx.cursor()
 
-    if alquila.lower() == "0":
-        alquila = 0 # 'true' o '1' se convierte a 1
-    else:
-        alquila = 1
-
     query = "UPDATE alumnos"
-    query += " SET nombre = %s, apellido = %s, alquila = %s"
+    query += " SET nombre = %s, apellido = %s, fecha_nacimiento = %s"
     query += " WHERE ciAlumno = %s"
 
-    cursor.execute(query, (nombre, apellido, alquila, ciAlumno))
+    cursor.execute(query, (nombre, apellido, ciAlumno, fecha_nacimiento))
 
     cnx.commit()
 
