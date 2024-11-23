@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clases</title>
     <style>
-        /* Aquí puedes incluir el mismo estilo CSS o ajustarlo según sea necesario */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -91,6 +90,59 @@
             background-color: #f1f1f1;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            text-decoration: none;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .buttonYellow {
+            background-color: #FFC107;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .buttonYellow:hover {
+            background-color: #ffb300;
+        }
+
     </style>
 </head>
 <body>
@@ -111,7 +163,7 @@
             </div>
             <div class="form-group">
                 <label for="turno">Turno:</label>
-                <input type="text" id="turno" name="turno" placeholder="Turno">
+                <input type="text" id="idTurno" name="idTurno" placeholder="Turno">
             </div>
             <div class="form-group">
                 <label for="dictada">Dictada:</label>
@@ -121,25 +173,33 @@
         </form>
     </div>
 
-    <!-- Tabla dinámica para mostrar los resultados -->
     {% if clases %}
         <div class="table-container">
             <table class="tabla">
                 <thead>
                 <tr>
-                    <th>CI Instructor</th>
+                    <th>ID</th>
+                    <th>Instructor</th>
                     <th>Actividad</th>
                     <th>Turno</th>
                     <th>Dictada</th>
+                    <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for clase in clases %}
                     <tr>
-                        <td>{{ clase.nombre }}</td>
+                        <td>{{ clase.idClase }}</td>
+                        <td>{{ clase.nombre }} {{ clase.apellido }}</td>
                         <td>{{ clase.descripcion }}</td>
-                        <td>{{ clase.turno }}</td>
+                        <td>{{ clase.idTurno }}</td>
                         <td>{{ clase.dictada }}</td>
+                        <td>
+                            <form action="/eliminar_clase/{{ clase.idClase }}" method="POST" style="display:inline;">
+                                <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
+                            </form>
+                            <button class="buttonYellow" onclick="openModal('{{ clase.idClase }}', '{{ clase.ciInstructor }}', '{{ clase.idActividad }}', '{{ clase.descripcion }}', '{{ clase.idTurno }}', '{{ clase.dictada }}')">Modificar</button>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -147,5 +207,53 @@
         </div>
     {% endif %}
 </div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Editar Clase</h2>
+        <form id="editForm" action="/editar_clase" method="POST">
+            <input type="hidden" id="idClase"  name="idClase">
+            <div class="form-group">
+                <label for="instructor">Instructor:</label>
+                <input type="text" id="ciInstructor" name="ciInstructor" placeholder="CI del instructor" required>
+            </div>
+            <div class="form-group">
+                <label for="actividad">Actividad:</label>
+                <input type="text" id="descripcion" name="descripcion" placeholder="ID de la actividad" required>
+            </div>
+            <div class="form-group">
+                <label for="turno">ID turno:</label>
+                <input type="text" id="idTurno" name="idTurno" placeholder="ID turno" required>
+            </div>
+            <div class="form-group">
+                <label for="dictada">Dictada:</label>
+                <select id="dictada" name="dictada" required>
+                    <option value="" disabled selected>Selecciona una opción:</option>
+                    <option value="sí">Sí</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <button type="submit" class="button">Modificar</button>
+            <button type="button" class="button" onclick="closeModal()">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(idClase, ciInstructor, descripcion, turno, dictada) {
+        document.getElementById('idClase').value = idClase;
+        document.getElementById('ciInstructor').value = ciInstructor;
+        document.getElementById('descripcion').value = descripcion;
+        document.getElementById('idTurno').value = turno;
+        document.getElementById('dictada').value = dictada;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+</script>
+
 </body>
 </html>

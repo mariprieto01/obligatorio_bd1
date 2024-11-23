@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Actividad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            width: 80%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            border: 1px solid #ddd;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: normal;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 97%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .cancel-button:hover {
+            background-color: #e53935;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .confirmation-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease, top 0.5s ease;
+            z-index: 1000;
+        }
+
+        .confirmation-message.show {
+            opacity: 1;
+            top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+{% if success %}
+    <div class="confirmation-message show">{{ success }}</div>
+    <script>
+        setTimeout(function(){
+            window.location.href = '/actividades';
+        }, 3000);
+    </script>
+{% endif %}
+
+{% if error %}
+    <div class="confirmation-message show">{{ error }}</div>
+    <script>
+        setTimeout(function(){
+            window.location.href = '/actividades';
+        }, 3000);
+    </script>
+{% endif %}
+
+<div class="form-container">
+    <h2>Nueva Actividad</h2>
+    <form id="actividadForm" method="POST" action="/actividad_nueva">
+        <div class="form-group">
+            <label for="idActividad">ID Actividad:</label>
+            <input type="text" id="idActividad" name="idActividad" required>
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripción:</label>
+            <input type="text" id="descripcion" name="descripcion" required>
+        </div>
+        <div class="form-group">
+            <label for="costo">Costo:</label>
+            <input type="text" id="costo" name="costo" required>
+        </div>
+      <div class="form-group">
+            <label for="restriccionEdad">Restricción de edad:</label>
+            <input type="text" id="restriccionEdad" name="restriccionEdad" required>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="submit-button">Ingresar</button>
+            <button type="button" class="cancel-button" onclick="window.location.href='/actividades'">Cancelar</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

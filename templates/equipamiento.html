@@ -88,7 +88,6 @@
             background-color: #f2f2f2;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -135,6 +134,7 @@
             border: none;
             padding: 10px 20px;
             cursor: pointer;
+            font-size: 1rem;
         }
 
         .buttonYellow:hover {
@@ -151,7 +151,7 @@
         </div>
         <form action="/buscar_equipamiento" method="POST">
             <div class="form-group">
-                <label for="titulo">Equipamiento:</label>
+                <label for="idEquipamiento">Equipamiento:</label>
                 <input type="text" id="idEquipamiento" name="idEquipamiento" placeholder="Nombre del equipamiento">
             </div>
             <div class="form-group">
@@ -159,7 +159,7 @@
                 <input type="text" id="descripcion" name="descripcion" placeholder="Descripción del equipamiento">
             </div>
             <div class="form-group">
-                <label for="actividad-eq">Actividad:</label>
+                <label for="actividad">Actividad:</label>
                 <input type="actividad" id="actividad" name="actividad-eq" placeholder="Actividad relacionada">
             </div>
             <div class="form-group">
@@ -170,7 +170,6 @@
         </form>
     </div>
 
-    <!-- Tabla dinámica para mostrar los resultados -->
     {% if equipamiento %}
         <div class="table-container">
             <table>
@@ -180,7 +179,7 @@
                     <th>Descripción</th>
                     <th>Actividad</th>
                     <th>Costo</th>
-                    <th>Acciones</th> <!-- Columna para acciones -->
+                    <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -191,11 +190,9 @@
                         <td>{{ item.idActividad }}</td>
                         <td>{{ item.costo }}</td>
                         <td>
-                            <!-- Formulario para eliminar -->
                             <form action="/eliminar_equipamiento/{{ item.idEquipamiento }}" method="POST" style="display:inline;">
                                 <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
                             </form>
-                            <!-- Botón para editar -->
                             <button class="buttonYellow" onclick="openModal({{ item.idEquipamiento }}, '{{ item.costo }}', '{{ item.descripcion }}', '{{ item.idActividad }}')">Modificar</button>
                         </td>
                     </tr>
@@ -206,7 +203,6 @@
     {% endif %}
 </div>
 
-<!-- Modal para editar equipamiento -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -232,7 +228,6 @@
 </div>
 
 <script>
-    // Función para abrir el modal y cargar los datos
     function openModal(id, costo, descripcion, actividad) {
         document.getElementById('idModal').value = id;  // Cargar el ID en el campo oculto
         document.getElementById('costoModal').value = costo;
@@ -242,7 +237,6 @@
     }
 
 
-    // Función para cerrar el modal
     function closeModal() {
         document.getElementById('editModal').style.display = "none";
     }
