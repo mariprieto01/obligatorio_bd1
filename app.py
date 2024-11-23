@@ -303,8 +303,8 @@ def alumno_nuevo():
         return render_template('nuevoAlumno.html', error="El alumno con esta CI ya existe en la base de datos.")
 
     query = """
-        INSERT INTO alumnos (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO alumnos (ciAlumno, nombre, apellido, fecha_nacimiento)
+        VALUES (%s, %s, %s, %s)
     """
 
     cursor.execute(query, (ciAlumno, nombre, apellido, fecha_nacimiento, idActividad, alquila))
