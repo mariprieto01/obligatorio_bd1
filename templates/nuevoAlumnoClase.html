@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva clase</title>
+    <title>Nuevo alumno</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,7 +43,8 @@
             color: #333;
         }
 
-        input[type="text"] {
+        input[type="text"],
+        input[type="date"] {
             width: 97%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -139,7 +140,7 @@
     <div class="confirmation-message show">{{ success }}</div>
     <script>
         setTimeout(function(){
-            window.location.href = '/clase';
+            window.location.href = '/alumnoClase';
         }, 3000);
     </script>
 {% endif %}
@@ -148,41 +149,29 @@
     <div class="confirmation-message show">{{ error }}</div>
     <script>
         setTimeout(function(){
-            window.location.href = '/clase';
+            window.location.href = '/alumnoClase';
         }, 3000);
     </script>
 {% endif %}
 
 <div class="form-container">
-    <h2>Nueva clase</h2>
-    <form id="claseForm" method="POST" action="/clase_nueva">
+    <h2>Nuevo alumno en una clase</h2>
+    <form id="alumnoClaseForm" method="POST" action="/nuevo_alumno_clase">
         <div class="form-group">
-            <label for="id">ID clase:</label>
+            <label for="idClase">ID clase:</label>
             <input type="text" id="idClase" name="idClase" required>
         </div>
         <div class="form-group">
-            <label for="instructor">Cédula del instructor:</label>
-            <input type="text" id="ciInstructor" name="ciInstructor" required>
+            <label for="ciAlumno">CI alumno:</label>
+            <input type="text" id="ciAlumno" name="ciAlumno" required>
         </div>
         <div class="form-group">
-            <label for="actividad">ID actividad:</label>
-            <input type="text" id="idActividad" name="idActividad" required>
-        </div>
-        <div class="form-group">
-            <label for="turno">ID turno:</label>
-            <input type="text" id="idTurno" name="idTurno" required>
-        </div>
-        <div class="form-group">
-            <label for="dictada">Dictada:</label>
-            <select id="dictada" name="dictada" required>
-                <option value="" disabled selected>Selecciona una opción:</option>
-                <option value="sí">Sí</option>
-                <option value="no">No</option>
-            </select>
+            <label for="idEquipamiento">ID equipamiento:</label>
+            <input type="text" id="idEquipamiento" name="idEquipamiento" required>
         </div>
         <div class="form-buttons">
             <button type="submit" class="submit-button">Ingresar</button>
-            <button type="button" class="cancel-button" onclick="window.location.href='/clase'">Cancelar</button>
+            <button type="button" class="cancel-button" onclick="window.location.href='/alumnos'">Cancelar</button>
         </div>
     </form>
 </div>

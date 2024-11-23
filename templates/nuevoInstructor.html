@@ -51,18 +51,41 @@
         }
 
         button {
-            width: 100%;
+            width: 48%;
             padding: 10px;
             font-size: 14px;
-            background-color: #4CAF50; 
-            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
 
         button:hover {
+            opacity: 0.9;
+        }
+
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .submit-button:hover {
             background-color: #45a049;
+        }
+
+        .cancel-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .cancel-button:hover {
+            background-color: #e53935;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         .confirmation-message {
@@ -87,12 +110,30 @@
 </head>
 <body>
 
+{% if success %}
+    <div class="confirmation-message show">{{ success }}</div>
+    <script>
+        setTimeout(function(){
+            window.location.href = '/instructores';
+        }, 3000);
+    </script>
+{% endif %}
+
+{% if error %}
+    <div class="confirmation-message show">{{ error }}</div>
+    <script>
+        setTimeout(function(){
+            window.location.href = '/instructores';
+        }, 3000);
+    </script>
+{% endif %}
+
 <div class="form-container">
     <h2>Nuevo instructor</h2>
-    <form id="instructorForm" method="POST" action="/instructor">
+    <form id="instructorForm" method="POST" action="/instructor_nuevo">
         <div class="form-group">
             <label for="ci">CI:</label>
-            <input type="text" id="ci" name="ci" required>
+            <input type="text" id="ciInstructor" name="ciInstructor" required>
         </div>
         <div class="form-group">
             <label for="nombre">Nombre:</label>
@@ -102,29 +143,12 @@
             <label for="apellido">Apellido:</label>
             <input type="text" id="apellido" name="apellido" required>
         </div>
-        <button type="submit">Ingresar</button>
+        <div class="form-buttons">
+            <button type="submit" class="submit-button">Ingresar</button>
+            <button type="button" class="cancel-button" onclick="window.location.href='/instructores'">Cancelar</button>
+        </div>
     </form>
 </div>
-
-<div class="confirmation-message" id="confirmationMessage">
-    Instructor ingresado correctamente.
-</div>
-
-<script>
-    document.getElementById('instructorForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        
-        const confirmationMessage = document.getElementById('confirmationMessage');
-        confirmationMessage.classList.add('show');
-
-        setTimeout(() => {
-            confirmationMessage.classList.remove('show');
-            history.back();
-        }, 4000);
-
-        // agregar lógica para enviar los datos al servidor
-    });
-</script>
 
 </body>
 </html>
