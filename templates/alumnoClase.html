@@ -63,6 +63,7 @@
             padding: 10px 20px;
             cursor: pointer;
             font-size: 1rem;
+            border-radius: 5px;
         }
 
         .button:hover {
@@ -93,6 +94,7 @@
             padding: 10px 20px;
             cursor: pointer;
             font-size: 1rem;
+            border-radius: 5px;
         }
 
         .search-button:hover {
@@ -131,6 +133,7 @@
             padding: 10px 20px;
             cursor: pointer;
             font-size: 1rem;
+            border-radius: 5px;
         }
 
         .buttonYellow:hover {
@@ -180,7 +183,7 @@
             <td>{{ alumno.ciAlumno }}</td>
             <td>{{ alumno.idEquipamiento }}</td>
             <td>
-                <form action="/eliminar_alumno_clase/{{ alumno.ciAlumno }}" method="POST" style="display:inline;">
+                <form action="/eliminar_alumno_clase/{{ alumno.ciAlumno }}/{{ alumno.idClase }}" method="POST" style="display:inline;">
                     <button type="submit" class="button" style="background-color: #f44336;">Eliminar</button>
                 </form>
                 <button class="buttonYellow" onclick="openModal({{ alumno.idClase }}, '{{ alumno.ciAlumno }}', '{{ alumno.idEquipamiento }}')">Modificar</button>

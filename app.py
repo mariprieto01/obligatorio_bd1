@@ -19,6 +19,10 @@ def dashboard():
 def alumnos_page():
     return render_template('alumnos.html')
 
+@app.route('/alumnoClase')
+def alumno_clase_page():
+    return render_template('alumnoClase.html')
+
 @app.route('/asignar_rol')
 def asignar_rol_page():
     return render_template('asignar_rol.html')
@@ -56,11 +60,6 @@ def registro():
         email = request.form['email']
         password = request.form['password']
 
-        print(f"Nombre recibido: {nombre}")
-        print(f"Apellido recibido: {apellido}")
-        print(f"Email recibido: {email}")
-        print(f"Contraseña recibida: {password}")
-
         cnx = get_db_connection()
         cursor = cnx.cursor()
         query = """
@@ -68,7 +67,6 @@ def registro():
         VALUES (%s, %s, %s, %s, null)
         """
         cursor.execute(query, (nombre, apellido, email, password))
-        print("Consulta ejecutada con éxito.")
         cnx.commit()
         cursor.close()
         cnx.close()
@@ -202,6 +200,7 @@ def buscar_equipamiento():
 @app.route('/buscar_clases', methods=['POST'])
 def buscar_clases():
     nombre = request.form.get('nombre', '').strip()
+    apellido = request.form.get('apellido', '').strip()
     actividad_clase = request.form.get('actividad_clase', '').strip()
     idTurno = request.form.get('idTurno', '').strip()
     dictada = request.form.get('dictada', '').strip()
@@ -209,17 +208,17 @@ def buscar_clases():
     cnx = get_db_connection()
     cursor = cnx.cursor(dictionary=True)
 
-    query = "select idClase, idTurno, dictada, descripcion, nombre"
+    query = "SELECT idClase, idTurno, dictada, descripcion, nombre, apellido"
     query += " FROM clase"
-    query += " inner join actividades a on clase.idActividad = a.idActividad"
-    query += " inner join instructores i on clase.ciInstructor = i.ciInstructor"
+    query += " INNER JOIN actividades a ON clase.idActividad = a.idActividad"
+    query += " INNER JOIN instructores i ON clase.ciInstructor = i.ciInstructor"
     query += " WHERE 1=1"
 
     params = []
 
     if nombre:
         query += " AND nombre LIKE %s"
-        params.append('%' + nombre + '%')
+        params.append('%' + nombre + '%' + apellido + '%')
 
     if actividad_clase:
         query += " AND a.descripcion LIKE %s"
@@ -869,14 +868,32 @@ def nuevo_alumno_clase():
         cnx = get_db_connection()
         cursor = cnx.cursor()
 
-        check_query = "SELECT * FROM alumno_clase WHERE idClase = %s AND ciAlumno = %s"
-        cursor.execute(check_query, (idClase, ciAlumno))
-        alumno_existente = cursor.fetchone()
+        check_clase_query = "SELECT * FROM clase WHERE idClase = %s"
+        cursor.execute(check_clase_query, (idClase,))
+        clase_existente = cursor.fetchone()
 
-        if alumno_existente:
+        if not clase_existente:
             cursor.close()
             cnx.close()
-            return render_template('nuevoAlumnoClase.html', error="El alumno ya existe en esta clase.")
+            return render_template('nuevoAlumnoClase.html', error="La clase con este ID no existe.")
+
+        check_alumno_query = "SELECT * FROM alumnos WHERE ciAlumno = %s"
+        cursor.execute(check_alumno_query, (ciAlumno,))
+        alumno_existente = cursor.fetchone()
+
+        if not alumno_existente:
+            cursor.close()
+            cnx.close()
+            return render_template('nuevoAlumnoClase.html', error="El alumno con esta cédula no existe.")
+
+        check_query = "SELECT * FROM alumno_clase WHERE idClase = %s AND ciAlumno = %s"
+        cursor.execute(check_query, (idClase, ciAlumno))
+        alumno_existente_en_clase = cursor.fetchone()
+
+        if alumno_existente_en_clase:
+            cursor.close()
+            cnx.close()
+            return render_template('nuevoAlumnoClase.html', error="El alumno ya está inscripto en esta clase.")
 
         query = """
             INSERT INTO alumno_clase (idClase, ciAlumno, idEquipamiento)
@@ -892,26 +909,44 @@ def nuevo_alumno_clase():
 
     return render_template('nuevoAlumnoClase.html')
 
-@app.route('/eliminar_alumno_clase/<ciAlumno>', methods=['POST'])
-def eliminar_alumno_clase(ciAlumno):
-    idClase = request.form.get('idClase')
-
+@app.route('/eliminar_alumno_clase/<ciAlumno>/<idClase>', methods=['POST'])
+def eliminar_alumno_clase(ciAlumno, idClase):
     cnx = get_db_connection()
     cursor = cnx.cursor()
 
-    if idClase:
+    try:
         query = "DELETE FROM alumno_clase WHERE ciAlumno = %s AND idClase = %s"
         cursor.execute(query, (ciAlumno, idClase))
-    else:
-        query = "DELETE FROM alumno_clase WHERE ciAlumno = %s"
-        cursor.execute(query, (ciAlumno,))
-
-    cnx.commit()
-    cursor.close()
-    cnx.close()
+        cnx.commit()
+    except Exception as e:
+        print(f"Error al eliminar el registro: {e}")
+        cnx.rollback()
+    finally:
+        cursor.close()
+        cnx.close()
 
     return redirect(url_for('mostrar_alumnos_clase'))
 
+@app.route('/cambiar_contrasena', methods=['GET', 'POST'])
+def cambiar_contrasena():
+    if request.method == 'POST':
+        email = request.form['email']
+        nueva_contrasena = request.form['nueva-contrasena']
+        confirmar_contrasena = request.form['confirmarContrasena']
+        if nueva_contrasena == confirmar_contrasena:
+            cnx = get_db_connection()
+            cursor = cnx.cursor()
+            query = "UPDATE login SET password = %s WHERE email = %s"
+            cursor.execute(query, (nueva_contrasena, email))
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+            return redirect(url_for('login', mensaje='Contraseña cambiada exitosamente'))
+        else:
+            return redirect(url_for('cambiar_contrasena', mensaje='Las contraseñas no coinciden'))
+
+    mensaje = request.args.get('mensaje')
+    return render_template('cambiarContraseña.html', mensaje=mensaje)
 
 if __name__ == '__main__':
     app.run(debug=True)
