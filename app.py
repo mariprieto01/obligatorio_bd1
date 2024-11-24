@@ -418,17 +418,20 @@ def editar_alumno():
     apellido = request.form['apellido']
     fecha_nacimiento = request.form['fecha_nacimiento']
 
+    print(ciAlumno, nombre, apellido, fecha_nacimiento)  # Depuración
+
     cnx = get_db_connection()
     cursor = cnx.cursor()
 
-    query = "UPDATE alumnos"
-    query += " SET nombre = %s, apellido = %s, fecha_nacimiento = %s"
-    query += " WHERE ciAlumno = %s"
+    query = """
+        UPDATE alumnos
+        SET nombre = %s, apellido = %s, fecha_nacimiento = %s
+        WHERE ciAlumno = %s
+    """
 
-    cursor.execute(query, (nombre, apellido, ciAlumno, fecha_nacimiento))
+    cursor.execute(query, (nombre, apellido, fecha_nacimiento, ciAlumno))
 
     cnx.commit()
-
     cursor.close()
     cnx.close()
 
@@ -549,8 +552,6 @@ def reporte():
         FROM actividades a
         JOIN equipamiento e ON a.idActividad = e.idActividad
         JOIN alumno_clase ac ON e.idEquipamiento = ac.idEquipamiento
-        JOIN alumnos al ON ac.ciAlumno = al.ciAlumno
-        WHERE al.alquila = 1
         GROUP BY a.descripcion
         ORDER BY ingresos DESC;
     """
@@ -558,9 +559,10 @@ def reporte():
     ingresos = cursor.fetchall()
 
     alumnos_query = """
-        SELECT a.descripcion AS actividad, COUNT(al.ciAlumno) AS cantidad_alumnos
+        SELECT a.descripcion AS actividad, COUNT(DISTINCT ac.ciAlumno) AS cantidad_alumnos
         FROM actividades a
-        JOIN alumnos al ON a.idActividad = al.idActividad
+        JOIN clase c ON a.idActividad = c.idActividad
+        JOIN alumno_clase ac ON c.idClase = ac.idClase
         GROUP BY a.descripcion
         ORDER BY cantidad_alumnos DESC;
     """
