@@ -34,12 +34,15 @@ def nuevo_alumno():
 @app.route('/instructor')
 def nuevo_instructor():
     return render_template('nuevoInstructor.html')
+
 @app.route('/nuevaClase')
 def nueva_clase():
     return render_template('nuevaClase.html')
+
 @app.route('/nuevoEquipamiento')
 def nuevo_equipamiento():
     return render_template('nuevoEquipamiento.html')
+
 @app.route('/equipamiento')
 def equipamiento_page():
     return render_template('equipamiento.html')

@@ -108,7 +108,7 @@
 
 <script>
     document.getElementById('registroForm').addEventListener('submit', function(event) {
-        event.preventDefault();  // Evita el envío predeterminado del formulario.
+        event.preventDefault();
 
         const formData = new FormData(this);
         const confirmationMessage = document.getElementById('confirmationMessage');
@@ -122,7 +122,7 @@
                     confirmationMessage.classList.add('show');
                     setTimeout(() => {
                         confirmationMessage.classList.remove('show');
-                        window.location.href = '/login'; // Redirige a la página de login tras el registro exitoso.
+                        window.location.href = '/login';
                     }, 4000);
                 } else {
                     alert('Error al registrar la cuenta. Por favor, inténtalo de nuevo.');
