@@ -403,7 +403,7 @@ def equipamiento_nuevo():
 
 @app.route('/eliminar_alumno/<int:ciAlumno>', methods=['POST'])
 def eliminar_alumno(ciAlumno):
-    print(f"Eliminando alumno con CI: {ciAlumno}")  # Añadir para depurar
+    print(f"Eliminando alumno con CI: {ciAlumno}")
     cnx = get_db_connection()
     cursor = cnx.cursor()
     query = "DELETE FROM alumnos WHERE ciAlumno = %s"
@@ -420,7 +420,7 @@ def editar_alumno():
     apellido = request.form['apellido']
     fecha_nacimiento = request.form['fecha_nacimiento']
 
-    print(ciAlumno, nombre, apellido, fecha_nacimiento)  # Depuración
+    print(ciAlumno, nombre, apellido, fecha_nacimiento)
 
     cnx = get_db_connection()
     cursor = cnx.cursor()
@@ -452,7 +452,7 @@ def eliminar_equipamiento(idEquipamiento):
 
 @app.route('/editar_equipamiento', methods=['POST'])
 def editar_equipamiento():
-    idEquipamiento = request.form['idModal']  # Asegúrate de que este campo esté en el formulario
+    idEquipamiento = request.form['idModal']
     descripcion = request.form['descripcion']
     costo = request.form['costo']
     actividad = request.form['actividad']
